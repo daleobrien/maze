@@ -74,6 +74,18 @@ def maze(width=10, height=10, density=50, _seed=None):
                 c.translate(x_offset, y_offset)
                 p = c.beginPath()
 
+                if i == 0 and j == height - 1:
+                    p.moveTo(3 * gap, 3 * gap)
+                    p.lineTo(cell_size - 3 * gap, cell_size - 3 * gap)
+                    p.moveTo(3 * gap, cell_size - 3 * gap)
+                    p.lineTo(cell_size - 3 * gap, 3 * gap)
+
+                if i == width - 1 and j == 0:
+                    p.moveTo(3 * gap, 3 * gap)
+                    p.lineTo(cell_size - 3 * gap, cell_size - 3 * gap)
+                    p.moveTo(3 * gap, cell_size - 3 * gap)
+                    p.lineTo(cell_size - 3 * gap, 3 * gap)
+
                 if cell == 1:
                     # TODO: add arcs ...
 
