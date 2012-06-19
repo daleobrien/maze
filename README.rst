@@ -7,9 +7,7 @@ Maze generator with crossing;
 
 will produce a pdf, much like this one by default;
 
-.. image:: http://i.imgur.com/LSREg.png
-
-.. image:: https://github.com/daleobrien/maze/blob/master/maze.gif
+.. image:: /daleobrien/maze/raw/master/maze.gif
 
 
 The ASCI version produces;
