@@ -3,10 +3,9 @@ maze
 
 Maze generator with crossing.
 
+    python maze_pdf.py    
 
-    python maze_pdf.py
-
-![my_maze.pdf](/daleobrien/maze/sample_maze.jpg "my_maze.pdf")
+![my_maze.pdf](sample_maze.jpg "my_maze.pdf")
 
 Will generate a maze much like this,
 
