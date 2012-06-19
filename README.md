@@ -5,12 +5,14 @@ Maze generator with crossing.
 
     python maze_pdf.py    
 
-![my_maze.pdf](sample_maze.jpg "my_maze.pdf")
-![my_maze.pdf](https://github.com/daleobrien/maze/blob/master/sample_maze.jpg "my_maze.pdf")
-![my_maze.pdf](https://github.com/daleobrien/maze/sample_maze.jpg "my_maze.pdf")
-![my_maze.pdf](//github.com/daleobrien/maze/sample_maze.jpg "my_maze.pdf")
-![my_maze.pdf](/daleobrien/maze/sample_maze.jpg "my_maze.pdf")
-![my_maze.pdf](/maze/sample_maze.jpg "my_maze.pdf")
+![Maze](sample_maze.jpg)
+![Maze](https://github.com/daleobrien/maze/blob/master/sample_maze.jpg)
+![Maze](https://github.com/daleobrien/maze/sample_maze.jpg)
+![Maze](//github.com/daleobrien/maze/sample_maze.jpg)
+![Maze](/daleobrien/maze/sample_maze.jpg)
+![Maze](/daleobrien/maze/blob/master/sample_maze.jpg)
+![Maze](/maze/blob/master/sample_maze.jpg)
+
 https://github.com/daleobrien/maze/blob/master/sample_maze.jpg
 
 Will generate a maze much like this,
