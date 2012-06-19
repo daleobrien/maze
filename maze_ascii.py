@@ -76,12 +76,16 @@ def maze(width=10, height=10, density=50, _seed=None, delay=0.0):
     def display_maze(grid):
         # top corner
         print "\x1B[H"
-        for row in grid:
+        print 'S'
+        for z, row in enumerate(grid):
             # upper/lower rows
             for i in [0, 1]:
                 for cell in row:
                     print TILES[cell][i],
-                print
+                if z == len(grid[0]) - 1 and i == 1:
+                    print 'E'
+                else:
+                    print
         print
 
     class Tree(object):
@@ -121,7 +125,9 @@ def maze(width=10, height=10, density=50, _seed=None, delay=0.0):
     print "\x1B[2J"  # clear the screen
 
     for cy in range(height - 2):
+        cy += 1
         for cx in range(width - 2):
+            cx += 1
 
             #next unless rand(100) < density
             if randint(0, 99) < density:
@@ -207,7 +213,7 @@ if __name__ == "__main__":
         help='density (default=50)', default=50)
 
     parser.add_argument('-d', dest="delay", type=float,
-        help='delay in seconds. Will step though the generation process (default=0), e.g. -d 0.01', default=0.0)
+        help='''delay in seconds. (default=0), e.g. -d 0.01', default=0.0)
 
     args = parser.parse_args()
 
