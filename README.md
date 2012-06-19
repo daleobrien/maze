@@ -7,7 +7,7 @@ Maze generator with crossing;
 
 will produce a pdf, much like this one by default;
 
-.. image:: /daleobrien/maze/raw/master/maze.gif
+![Maze](/daleobrien/maze/raw/master/maze.gif)
 
 
 The ASCI version produces;
