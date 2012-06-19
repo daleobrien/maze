@@ -22,310 +22,337 @@ import argparse
 from reportlab.pdfgen.canvas import Canvas
 
 
-def maze(width=10, height=10, density=50, _seed=None):
-
-    _seed = 1
-    # --------------------------------------------------------------------
-    # 1. Allow the maze to be customized via command-line parameters
-    # --------------------------------------------------------------------
+def maze(width=10, height=10, density=50, _seed=None,
+         draw_with_curves=True,
+         filename='my_maze.pdf',
+         use_A4=True):
 
     if _seed is None:
         _seed = randint(0, 90010000)
     seed(_seed)
 
-    # --------------------------------------------------------------------
-    # 2. Set up constants to aid with describing the passage directions
-    # --------------------------------------------------------------------
-
+    # Set up constants to aid with describing the passage directions
     N, S, E, W, U = 0x1, 0x2, 0x4, 0x8, 0x10
     DX = {E: 1, W: -1, N: 0, S: 0}
     DY = {E: 0, W:  0, N: -1, S: 1}
     OPPOSITE = {E: W, W: E, N: S, S: N}
 
+    # generate pdf
     def display_maze(grid):
 
-        c = Canvas('xx.pdf')
+        def s_shape_00(p):
+            p.moveTo(a, 0)
+            if draw_with_curves:
+                p.arcTo(-a, -a, a, a, 0, 90)
+            else:
+                p.lineTo(a, a)
+            p.lineTo(0, a)
+
+        def s_shape_01(p):
+            p.moveTo(0, b)
+            if draw_with_curves:
+                p.arcTo(-a, b, a, s + a, 270, 90)
+            else:
+                p.lineTo(a, b)
+            p.lineTo(a, s)
+
+        def s_shape_10(p):
+            p.moveTo(s, a)
+            if draw_with_curves:
+                p.arcTo(b, -a, s + a, a, 90, 90)
+            else:
+                p.lineTo(b, a)
+            p.lineTo(b, 0)
+
+        def s_shape_11(p):
+            p.moveTo(s, b)
+            if draw_with_curves:
+                p.arcTo(b, b, s + a, s + a, 270, -90)
+            else:
+                p.lineTo(b, b)
+            p.lineTo(b, s)
+
+        c = Canvas(filename)
         c.setTitle('Maze')
         c.setSubject("")
         c.setAuthor("Dale O'Brien")
 
-        page_width = 8.5 * 72
-        page_height = 11.0 * 72
+        if use_A4:
+            page_width = 8.3 * 72
+            page_height = 11.7 * 72
+        else:
+            page_width = 8.5 * 72
+            page_height = 11.0 * 72
 
         c.setPageSize((page_width, page_height))
 
-        # 0=butt,1=round,2=square
+        # 0=butt,1=draw_with_curves,2=square
         c.setLineCap(1)
 
         left_margin = 10
         top_margin = 10
 
-        cell_size = (page_width - 2 * left_margin) / width
-        gap = 4
-        c.setLineWidth(gap)
+        s = (page_width - 2 * left_margin) / width
+        g = int(s * 0.2)
+        stroke = s / 7.0
+        c.setLineWidth(stroke)
 
         for j, row in enumerate(grid):
             # upper/lower rows
             for i, cell in enumerate(row):
 
-                x_offset = left_margin + i * cell_size
-                y_offset = top_margin + j * cell_size
+                x_offset = left_margin + i * s
+                y_offset = top_margin + j * s
 
                 c.translate(x_offset, y_offset)
                 p = c.beginPath()
 
-                if i == 0 and j == height - 1:
-                    p.moveTo(3 * gap, 3 * gap)
-                    p.lineTo(cell_size - 3 * gap, cell_size - 3 * gap)
-                    p.moveTo(3 * gap, cell_size - 3 * gap)
-                    p.lineTo(cell_size - 3 * gap, 3 * gap)
+                a = g
+                b = s - g
 
-                if i == width - 1 and j == 0:
-                    p.moveTo(3 * gap, 3 * gap)
-                    p.lineTo(cell_size - 3 * gap, cell_size - 3 * gap)
-                    p.moveTo(3 * gap, cell_size - 3 * gap)
-                    p.lineTo(cell_size - 3 * gap, 3 * gap)
+                # mark start and end
+                start = False
+                end = False
+                if (i == 0 and j == height - 1):
+                    start = True
 
-                if cell == 1:
-                    # TODO: add arcs ...
+                if (i == width - 1 and j == 0):
+                    end = True
 
-                    '│ │'
-                    '└─┘'
-
-                    p.moveTo(gap, 0)
-                    p.lineTo(gap, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size - gap)
-                    p.lineTo(cell_size - gap, 0)
-
-                    #p.arcTo(gap, cell_size / 2.0,
-                    #         cell_size - gap, cell_size - gap,
-                    #        0, 180)
-
-                if cell == 2:
-
-                    '┌─┐'
-                    '│ │'
-
-                    p.moveTo(gap, cell_size)
-                    p.lineTo(gap, gap)
-                    p.lineTo(cell_size - gap, gap)
-                    p.lineTo(cell_size - gap, cell_size)
+                if start or end:
+                    c.setStrokeColorRGB(0.9, 0.1, 0.1)
+                    p.circle(s / 2.0, s / 2.0, g / 1.5)
+                    c.drawPath(p)
+                    p = c.beginPath()
+                    c.setStrokeColorRGB(0.0, 0.0, 0.0)
 
                 if cell == 3:
 
                     '│ │'
                     '│ │'
 
-                    p.moveTo(gap, cell_size)
-                    p.lineTo(gap, 0)
-                    p.moveTo(cell_size - gap, cell_size)
-                    p.lineTo(cell_size - gap, 0)
+                    p.moveTo(a, s)
+                    p.lineTo(a, 0)
+                    p.moveTo(b, s)
+                    p.lineTo(b, 0)
+
+                if cell == 1:
+
+                    '│ │'
+                    '└─┘'
+
+                    p.moveTo(b, 0)
+                    if draw_with_curves:
+                        p.arcTo(a, a, b, b, 0, 180)
+                    else:
+                        p.lineTo(b, b)
+                        p.lineTo(a, b)
+                    p.lineTo(g, 0)
+
+                if cell == 2:
+
+                    '┌─┐'
+                    '│ │'
+
+                    p.moveTo(b, s)
+                    if draw_with_curves:
+                        p.arcTo(a, a, b, b, 0, -180)
+                    else:
+                        p.lineTo(b, a)
+                        p.lineTo(a, a)
+                    p.lineTo(a, s)
 
                 if cell == 4:
 
                     '┌──'
                     '└──'
 
-                    p.moveTo(cell_size, cell_size - gap)
-                    p.lineTo(gap, cell_size - gap)
-                    p.lineTo(gap, gap)
-                    p.lineTo(cell_size, gap)
-
-                if cell == 5:
-
-                    '│ └'
-                    '└──'
-
-                    p.moveTo(gap, 0)
-                    p.lineTo(gap, cell_size - gap)
-                    p.lineTo(cell_size, cell_size - gap)
-
-                    p.moveTo(cell_size,  gap)
-                    p.lineTo(cell_size - gap, gap)
-                    p.lineTo(cell_size - gap, 0)
-
-                if cell == 6:
-
-                    '┌──'
-                    '│ ┌'
-
-                    p.moveTo(cell_size,  cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size)
-
-                    p.moveTo(cell_size, gap)
-                    p.lineTo(gap, gap)
-                    p.lineTo(gap, cell_size)
-
-                if cell == 7:
-
-                    '│ └'
-                    '│ ┌'
-
-                    p.moveTo(gap, cell_size)
-                    p.lineTo(gap, 0)
-
-                    p.moveTo(cell_size, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size)
-
-                    p.moveTo(cell_size,  gap)
-                    p.lineTo(cell_size - gap, gap)
-                    p.lineTo(cell_size - gap, 0)
+                    p.moveTo(s, b)
+                    if draw_with_curves:
+                        p.arcTo(a, a, b, b, 90, 180)
+                    else:
+                        p.lineTo(g, b)
+                        p.lineTo(a, a)
+                    p.lineTo(s, a)
 
                 if cell == 8:
 
                     '──┐'
                     '──┘'
 
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size - gap)
-                    p.lineTo(cell_size - gap, gap)
-                    p.lineTo(0, gap)
+                    p.moveTo(0, b)
+                    if draw_with_curves:
+                        p.arcTo(a, a, b, b, 90, -180)
+                    else:
+                        p.lineTo(b, b)
+                        p.lineTo(b, a)
+                    p.lineTo(0, a)
+
+                if cell == 5:
+
+                    '│ └'
+                    '└──'
+
+                    s_shape_10(p)
+
+                    p.moveTo(s, b)
+                    if draw_with_curves:
+                        if start:
+                            p.arcTo(a, a, b, b, 90, 90)
+                        else:
+                            p.arcTo(a, 2 * a - b, 2 * b - a, b, 90, 90)
+                    else:
+                        p.lineTo(a, b)
+                    p.lineTo(a, 0)
+
+                if cell == 6:
+
+                    '┌──'
+                    '│ ┌'
+
+                    s_shape_11(p)
+
+                    p.moveTo(s, a)
+                    if draw_with_curves:
+                        p.arcTo(a, a, 2 * b + a, 2 * b + a, 270, -90)
+                    else:
+                        p.lineTo(a, a)
+                    p.lineTo(a, s)
+
+                if cell == 7:
+
+                    '│ └'
+                    '│ ┌'
+
+                    p.moveTo(a, s)
+                    p.lineTo(a, 0)
+
+                    s_shape_10(p)
+                    s_shape_11(p)
 
                 if cell == 9:
 
                     '┘ │'
                     '──┘'
 
-                    p.moveTo(0, gap)
-                    p.lineTo(gap, gap)
-                    p.lineTo(gap, 0)
+                    s_shape_00(p)
 
-                    p.moveTo(cell_size - gap, 0)
-                    p.lineTo(cell_size - gap, cell_size - gap)
-                    p.lineTo(0, cell_size - gap)
+                    p.moveTo(b, 0)
+                    if draw_with_curves:
+                        p.arcTo(2 * a - b, 2 * a - b, b, b, 0, 90)
+                    else:
+                        p.lineTo(b, b)
+                    p.lineTo(0, b)
 
                 if cell == 10:
 
                     '──┐'
                     '┐ │'
 
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(gap, cell_size - gap)
-                    p.lineTo(gap, cell_size)
+                    s_shape_01(p)
 
-                    p.moveTo(0, gap)
-                    p.lineTo(cell_size - gap, gap)
-                    p.lineTo(cell_size - gap, cell_size)
+                    p.moveTo(0, a)
+                    if draw_with_curves:
+                        if end:
+                            p.arcTo(a, a, b, b, 270, 90)
+                        else:
+                            p.arcTo(2 * a - b, a, b, 2 * b + a, 270, 90)
+                    else:
+                        p.lineTo(b, a)
+                    p.lineTo(b, s)
 
                 if cell == 11:
 
                     '┘ │'
                     '┐ │'
 
-                    p.moveTo(cell_size - gap, cell_size)
-                    p.lineTo(cell_size - gap, 0)
+                    p.moveTo(b, s)
+                    p.lineTo(b, 0)
 
-                    p.moveTo(0, gap)
-                    p.lineTo(gap, gap)
-                    p.lineTo(gap, 0)
-
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(gap, cell_size - gap)
-                    p.lineTo(gap, cell_size)
+                    s_shape_00(p)
+                    s_shape_01(p)
 
                 if cell == 12:
 
                     '───'
                     '───'
 
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(cell_size, cell_size - gap)
-                    p.moveTo(0, gap)
-                    p.lineTo(cell_size, gap)
+                    p.moveTo(0, b)
+                    p.lineTo(s, b)
+                    p.moveTo(0, a)
+                    p.lineTo(s, a)
 
                 if cell == 13:
 
                     '┘ └'
                     '───'
 
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(cell_size, cell_size - gap)
+                    p.moveTo(0, b)
+                    p.lineTo(s, b)
 
-                    p.moveTo(0, gap)
-                    p.lineTo(gap, gap)
-                    p.lineTo(gap, 0)
+                    s_shape_00(p)
+                    s_shape_10(p)
 
-                    p.moveTo(cell_size,  gap)
-                    p.lineTo(cell_size - gap, gap)
-                    p.lineTo(cell_size - gap, 0)
                 if cell == 14:
 
                     '───'
                     '┐ ┌'
 
-                    p.moveTo(0, gap)
-                    p.lineTo(cell_size, gap)
+                    p.moveTo(0, a)
+                    p.lineTo(s, a)
 
-                    p.moveTo(cell_size, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size)
-
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(gap, cell_size - gap)
-                    p.lineTo(gap, cell_size)
+                    s_shape_01(p)
+                    s_shape_11(p)
 
                 if cell == 15:
 
                     '┘ └'
                     '┐ ┌'
 
-                    p.moveTo(0, gap)
-                    p.lineTo(gap, gap)
-                    p.lineTo(gap, 0)
-
-                    p.moveTo(cell_size, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size)
-
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(gap, cell_size - gap)
-                    p.lineTo(gap, cell_size)
-
-                    p.moveTo(cell_size,  gap)
-                    p.lineTo(cell_size - gap, gap)
-                    p.lineTo(cell_size - gap, 0)
+                    s_shape_00(p)
+                    s_shape_10(p)
+                    s_shape_01(p)
+                    s_shape_11(p)
 
                 if cell == 19:
 
                     '┤ ├'
                     '┤ ├'
 
-                    p.moveTo(gap, cell_size)
-                    p.lineTo(gap, 0)
-                    p.moveTo(cell_size - gap, cell_size)
-                    p.lineTo(cell_size - gap, 0)
+                    p.moveTo(a, s)
+                    p.lineTo(a, 0)
+                    p.moveTo(b, s)
+                    p.lineTo(b, 0)
 
-                    p.moveTo(0, gap)
-                    p.lineTo(gap, gap)
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(gap, cell_size - gap)
+                    p.moveTo(0, a)
+                    p.lineTo(a, a)
+                    p.moveTo(0, b)
+                    p.lineTo(a, b)
 
-                    p.moveTo(cell_size, gap)
-                    p.lineTo(cell_size - gap, gap)
-                    p.moveTo(cell_size, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size - gap)
+                    p.moveTo(s, a)
+                    p.lineTo(b, a)
+                    p.moveTo(s, b)
+                    p.lineTo(b, b)
 
                 if cell == 28:
 
                     '┴─┴'
                     '┬─┬'
 
-                    p.moveTo(0, cell_size - gap)
-                    p.lineTo(cell_size, cell_size - gap)
-                    p.moveTo(0, gap)
-                    p.lineTo(cell_size, gap)
+                    p.moveTo(0, b)
+                    p.lineTo(s, b)
+                    p.moveTo(0, a)
+                    p.lineTo(s, a)
 
-                    p.moveTo(gap, gap)
-                    p.lineTo(gap, 0)
-                    p.moveTo(gap, cell_size - gap)
-                    p.lineTo(gap, cell_size)
+                    p.moveTo(a, a)
+                    p.lineTo(a, 0)
+                    p.moveTo(a, b)
+                    p.lineTo(a, s)
 
-                    p.moveTo(cell_size - gap, gap)
-                    p.lineTo(cell_size - gap, 0)
-                    p.moveTo(cell_size - gap, cell_size - gap)
-                    p.lineTo(cell_size - gap, cell_size)
+                    p.moveTo(b, a)
+                    p.lineTo(b, 0)
+                    p.moveTo(b, b)
+                    p.lineTo(b, s)
 
                 c.drawPath(p)
                 c.translate(-x_offset, -y_offset)
@@ -367,9 +394,10 @@ def maze(width=10, height=10, density=50, _seed=None):
     # --------------------------------------------------------------------
 
     for cy in range(height - 2):
+        cy += 1
         for cx in range(width - 2):
+            cx += 1
 
-            #next unless rand(100) < density
             if randint(0, 99) < density:
                 continue
 
@@ -420,23 +448,29 @@ def maze(width=10, height=10, density=50, _seed=None):
 
     display_maze(grid)
 
-    # --------------------------------------------------------------------
-    # 6. Show the parameters used to build this maze, for repeatability
-    # --------------------------------------------------------------------
-
-    #print "width=%d, height=%d, density=%d, seed=%d" % (width,
-    #                                        height, density, _seed)
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Generate a maze')
 
     parser.add_argument('-W', dest="width", type=int,
-        help='width (default=10)', default=20)
+        help='width (default=21)', default=21)
+
     parser.add_argument('-H', dest="height", type=int,
-        help='height (default=10)', default=20)
+        help='height (default=30)', default=30)
+
     parser.add_argument('-D', dest="density", type=int,
         help='density (default=50)', default=50)
+
+    parser.add_argument('-C', dest="draw_with_curves", type=int,
+        help='Draw with curves -C 1, 0 is all straight lines', default=1)
+
+    parser.add_argument('-A', dest="use_A4", type=int,
+        help='Select A4 page size 1 selects A4 (default), 0 selects 8.5x11 inches',
+        default=1)
+
+    parser.add_argument('-f', dest="filename", type=str,
+        help='PDF filename (default="my_maze.pdf")', default="my_maze.pdf")
 
     args = parser.parse_args()
 
