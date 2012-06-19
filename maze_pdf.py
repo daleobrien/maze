@@ -89,8 +89,8 @@ def maze(width=10, height=10, density=50, _seed=None,
         # 0=butt,1=draw_with_curves,2=square
         c.setLineCap(1)
 
-        left_margin = 10
-        top_margin = 10
+        left_margin = 15
+        top_margin = 15
 
         s = (page_width - 2 * left_margin) / width
         g = int(s * 0.2)
