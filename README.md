@@ -1,7 +1,12 @@
 maze
 ====
 
-Maze generator, with crossing
+Maze generator with crossing.
+
+
+    python maze_pdf.py
+
+![my_maze.pdf](/sample_maze.jpg "my_maze.pdf")
 
 Will generate a maze much like this,
 
@@ -28,4 +33,8 @@ Will generate a maze much like this,
     │ │ │ └ ─── ┘ │ │ │ ┌── ┘ │ │ │ │ └ ──┐
     └─┘ └── ─── ──┘ └─┘ └── ──┘ └─┘ └── ──┘
 
+Requirements
+===
+For the maze_pdf.py, you will need to install reportlab.
 
+    pip install reportlab
