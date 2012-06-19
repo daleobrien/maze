@@ -121,8 +121,9 @@ def maze(width=10, height=10, density=50, _seed=None,
 
                 if start or end:
                     c.setStrokeColorRGB(0.9, 0.1, 0.1)
+                    c.setFillColorRGB(0.9, 0.1, 0.1)
                     p.circle(s / 2.0, s / 2.0, g / 1.5)
-                    c.drawPath(p)
+                    c.drawPath(p, fill=True)
                     p = c.beginPath()
                     c.setStrokeColorRGB(0.0, 0.0, 0.0)
 
