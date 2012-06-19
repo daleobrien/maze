@@ -1,21 +1,15 @@
 maze
 ====
 
-Maze generator with crossing.
+Maze generator with crossing;
 
     python maze_pdf.py    
 
-![Maze](sample_maze.jpg)
-![Maze](https://github.com/daleobrien/maze/blob/master/sample_maze.jpg)
-![Maze](https://github.com/daleobrien/maze/sample_maze.jpg)
-![Maze](//github.com/daleobrien/maze/sample_maze.jpg)
-![Maze](/daleobrien/maze/sample_maze.jpg)
-![Maze](/daleobrien/maze/blob/master/sample_maze.jpg)
-![Maze](/maze/blob/master/sample_maze.jpg)
+will produce a pdf, much like this one by default;
 
-https://github.com/daleobrien/maze/blob/master/sample_maze.jpg
+    https://github.com/daleobrien/maze/blob/master/my_maze.pdf
 
-Will generate a maze much like this,
+The ASCI version produces;
 
     python maze_ascii.py
 
