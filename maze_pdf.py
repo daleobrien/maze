@@ -20,6 +20,7 @@
 from random import shuffle, seed, randint
 import argparse
 from reportlab.pdfgen.canvas import Canvas
+from math import sqrt, asin, pi
 
 
 def maze(width=10, height=10, density=50, _seed=None,
@@ -27,6 +28,7 @@ def maze(width=10, height=10, density=50, _seed=None,
          filename='my_maze.pdf',
          use_A4=True):
 
+    _seed = 1
     if _seed is None:
         _seed = randint(0, 90010000)
     seed(_seed)
@@ -93,9 +95,23 @@ def maze(width=10, height=10, density=50, _seed=None,
         top_margin = 15
 
         s = (page_width - 2 * left_margin) / width
-        g = int(s * 0.2)
+        g = s * 0.2
         stroke = s / 7.0
         c.setLineWidth(stroke)
+
+        k = 0.5
+
+        n = -(g / k) + 0.5 * (s - sqrt((g *
+            (4.0 * g - 3.0 * g * k + 2 * k * s)) / k))
+
+        r = g / k
+        q = n + r
+        v = (g * (-1 + k)) / k
+
+        theta = asin((2.0 * g - 2.0 * g * k + k * s) /
+            (2.0 * g - g * k + k * s)) * 180 / pi
+
+        delta = theta - 90
 
         for j, row in enumerate(grid):
             # upper/lower rows
@@ -144,7 +160,22 @@ def maze(width=10, height=10, density=50, _seed=None,
 
                     p.moveTo(b, 0)
                     if draw_with_curves:
-                        p.arcTo(a, a, b, b, 0, 180)
+
+                        p.lineTo(b, q)
+                        x = s - v - r
+                        y = n
+                        p.arcTo(x, y, x + 2 * r, y + 2 * r, 180, delta)
+
+                        p.arcTo(g / 2,
+                                g / 2,
+                                s - g / 2,
+                                s - g / 2, theta - 90, 360 - 2 * theta)
+
+                        x = v - r
+                        p.arcTo(x, y,
+                                x + 2 * r,
+                                y + 2 * r, 90 - theta, delta)
+
                     else:
                         p.lineTo(b, b)
                         p.lineTo(a, b)
@@ -157,7 +188,21 @@ def maze(width=10, height=10, density=50, _seed=None,
 
                     p.moveTo(b, s)
                     if draw_with_curves:
-                        p.arcTo(a, a, b, b, 0, -180)
+
+                        x = s - v - r
+                        y = s - n - 2 * r
+                        p.arcTo(x, y, x + 2 * r, y + 2 * r, 180, -delta)
+
+                        p.arcTo(g / 2,
+                                g / 2,
+                                s - g / 2,
+                                s - g / 2, 90 - theta, -360 + 2 * theta)
+
+                        x = v - r
+                        p.arcTo(x, y,
+                                x + 2 * r,
+                                y + 2 * r, 270 + theta, -delta)
+
                     else:
                         p.lineTo(b, a)
                         p.lineTo(a, a)
@@ -170,7 +215,20 @@ def maze(width=10, height=10, density=50, _seed=None,
 
                     p.moveTo(s, b)
                     if draw_with_curves:
-                        p.arcTo(a, a, b, b, 90, 180)
+                        x = s - n - 2 * r
+                        y = s - v - r
+                        p.arcTo(x, y, x + 2 * r, y + 2 * r, 270, delta)
+
+                        p.arcTo(g / 2,
+                                g / 2,
+                                s - g / 2,
+                                s - g / 2, 90 + delta, 360 - 2 * theta)
+
+                        y = v - r
+                        p.arcTo(x, y,
+                                x + 2 * r,
+                                y + 2 * r, 180 - theta, delta)
+
                     else:
                         p.lineTo(g, b)
                         p.lineTo(a, a)
@@ -183,7 +241,20 @@ def maze(width=10, height=10, density=50, _seed=None,
 
                     p.moveTo(0, b)
                     if draw_with_curves:
-                        p.arcTo(a, a, b, b, 90, -180)
+                        x = n
+                        y = s - v - r
+
+                        p.arcTo(x, y, x + 2 * r, y + 2 * r, 270, -delta)
+
+                        p.arcTo(g / 2,
+                                g / 2,
+                                s - g / 2,
+                                s - g / 2, 90 - delta, -360 + 2 * theta)
+
+                        y = v - r
+                        p.arcTo(x, y,
+                                x + 2 * r,
+                                y + 2 * r, theta, -delta)
                     else:
                         p.lineTo(b, b)
                         p.lineTo(b, a)
@@ -467,7 +538,7 @@ if __name__ == "__main__":
         help='Draw with curves -C 1, 0 is all straight lines', default=1)
 
     parser.add_argument('-A', dest="use_A4", type=int,
-        help='Select A4 page size 1 selects A4 (default), 0 selects 8.5x11 inches',
+    help='Select A4 page size 1 selects A4 (default), 0 selects 8.5x11 inches',
         default=1)
 
     parser.add_argument('-f', dest="filename", type=str,
