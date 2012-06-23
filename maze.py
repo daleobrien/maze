@@ -528,7 +528,7 @@ if __name__ == "__main__":
         default=1)
 
     parser.add_argument('-f', dest="filename", type=str,
-        help='PDF filename (default="my_maze.pdf")', default="my_maze.pdf")
+        help='PDF filename (default="maze.pdf")', default="maze.pdf")
 
     args = parser.parse_args()
 
