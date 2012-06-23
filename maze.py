@@ -1,21 +1,9 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
 # Ported to Python from https://gist.github.com/856138
+# to render to PDF
 #
-#
-
-# --------------------------------------------------------------------
-# An implementation of a "weave" maze generator. Weave mazes are those
-# with passages that pass both over and under other passages. The
-# technique used in this program was described to me by Robin Houston,
-# and works by first decorating the blank grid with the over/under
-# crossings, and then using Kruskal's algorithm to fill out the rest
-# of the grid. (Kruskal's is very well-suited to this approach, since
-# it treats the cells as separate sets and joins them together.)
-# --------------------------------------------------------------------
-# NOTE: the display routine used in this script requires a terminal
-# that supports ANSI escape sequences. Windows users, sorry. :(
-# --------------------------------------------------------------------
 
 from random import shuffle, seed, randint
 import argparse
@@ -28,7 +16,6 @@ def maze(width=10, height=10, density=50, _seed=None,
          filename='my_maze.pdf',
          use_A4=True):
 
-    _seed = 1
     if _seed is None:
         _seed = randint(0, 90010000)
     seed(_seed)
@@ -464,7 +451,6 @@ def maze(width=10, height=10, density=50, _seed=None,
     # --------------------------------------------------------------------
     # 4. Build the over/under locations
     # --------------------------------------------------------------------
-
     for cy in range(height - 2):
         cy += 1
         for cx in range(width - 2):
