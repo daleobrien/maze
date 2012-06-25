@@ -13,6 +13,6 @@ There is also an ASCII version, which produces a simple ascii art.
 
 Requirements
 ===
-For the maze_pdf.py, you will need to install reportlab.
+You will need to install reportlab.
 
     pip install reportlab
