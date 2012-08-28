@@ -23,9 +23,7 @@ import argparse
 
 
 def maze(width=10, height=10, density=50, _seed=None, delay=0.0):
-    '''
-    delay, if bigger than 0, will display the intial maze, and step through
-    '''
+    # delay, if bigger than 0, will display the intial maze, and step through
 
     # --------------------------------------------------------------------
     # 1. Allow the maze to be customized via command-line parameters
@@ -213,7 +211,8 @@ if __name__ == "__main__":
         help='density (default=50)', default=50)
 
     parser.add_argument('-d', dest="delay", type=float,
-        help='''delay in seconds. (default=0), e.g. -d 0.01', default=0.0)
+        help="delay in seconds. (default=0), e.g. -d 0.01",
+        default=0.0)
 
     args = parser.parse_args()
 

@@ -7,6 +7,7 @@
 
 from random import shuffle, seed, randint
 import argparse
+import sys
 from reportlab.pdfgen.canvas import Canvas
 from math import sqrt, asin, pi
 
@@ -528,11 +529,15 @@ if __name__ == "__main__":
         default=1)
 
     parser.add_argument('-f', dest="filename", type=str,
-        help='PDF filename (default="maze.pdf")', default="maze.pdf")
+        help='PDF filename', required=True)
 
     args = parser.parse_args()
 
-    # do it
-    maze(**vars(args))
+    if len(sys.argv) == 1:
+        #parser.print_help()
+        pass
+
+    else:
+        maze(**vars(args))
 
 #
