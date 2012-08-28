@@ -3,7 +3,7 @@ maze
 
 Maze generator with crossing;
 
-    python maze.py    
+    maze -f my_maze.pdf    
 
 will produce a pdf, much like this one by default;
 
@@ -11,8 +11,8 @@ will produce a pdf, much like this one by default;
 
 There is also an ASCII version, which produces a simple ascii art.
 
-Requirements
+Installation
 ===
-You will need to install reportlab.
+    pip install maze
 
-    pip install reportlab
+
