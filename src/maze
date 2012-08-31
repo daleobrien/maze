@@ -4,6 +4,15 @@
 # Ported to Python from https://gist.github.com/856138
 # to render to PDF
 #
+# --------------------------------------------------------------------
+# An implementation of a "weave" maze generator. Weave mazes are those
+# with passages that pass both over and under other passages. The
+# technique used in this program was described to me by Robin Houston,
+# and works by first decorating the blank grid with the over/under
+# crossings, and then using Kruskal's algorithm to fill out the rest
+# of the grid. (Kruskal's is very well-suited to this approach, since
+# it treats the cells as separate sets and joins them together.)
+# --------------------------------------------------------------------
 
 from random import shuffle, seed, randint
 import argparse
