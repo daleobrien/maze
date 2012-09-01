@@ -131,12 +131,14 @@ def maze(width=10,
 
     # to pdf, if we have a filename
     if filename:
-        from renderers.pdf import render
+        # TODO: this import isn't right
+        from src.renderers.pdf import render
         render(grid, render_options)
 
     # to screen
     if dislay_to_screen:
-        from renderers.text import render
+        # TODO: this import isn't right
+        from src.renderers.text import render
         render(grid, render_options)
 
 

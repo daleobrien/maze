@@ -58,7 +58,7 @@ def render(grid, options):
                  '┬─┬')}
 
     # top left corner
-    print "\x1B[H"
+    #print "\x1B[H"
     print 'Start' + ' ' * len(grid[0]) * 2
 
     for z, row in enumerate(grid):

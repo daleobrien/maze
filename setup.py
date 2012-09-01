@@ -1,11 +1,12 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 description = '''App that generates mazes'''
 
 setup(
     name='maze',
+    packages=find_packages(),
     scripts=['src/maze'],
     version=__version__,
     description=description,
