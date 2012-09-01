@@ -1,4 +1,6 @@
 *.py[co]
+*.swp
+.DS_Store
 
 # Packages
 *.egg

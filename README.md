@@ -7,9 +7,12 @@ Maze generator with crossing;
 
 will produce a pdf, much like this one by default;
 
-![Maze](/daleobrien/maze/raw/master/maze.jpg)
+Run
+    maze
 
-There is also an ASCII version, which produces a simple ascii art.
+to see a list of options.
+
+![Maze](/daleobrien/maze/raw/master/maze.jpg)
 
 Installation
 ===

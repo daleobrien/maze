@@ -2,6 +2,7 @@
 
 from math import sqrt, asin, pi
 from reportlab.pdfgen.canvas import Canvas
+from StringIO import StringIO
 
 
 # generate pdf
@@ -9,6 +10,7 @@ def render(grid, options):
 
     draw_with_curves = options['draw_with_curves']
     filename = options['filename']
+
     use_A4 = options['use_A4']
     width = options['width']
     height = options['height']
@@ -45,7 +47,12 @@ def render(grid, options):
             p.lineTo(b, b)
         p.lineTo(b, s)
 
-    c = Canvas(filename)
+    buffer = StringIO()
+    if filename:
+        c = Canvas(filename)
+    else:
+        c = Canvas(buffer)
+
     c.setTitle('Maze')
     c.setSubject("")
     c.setAuthor("Dale O'Brien")
@@ -401,3 +408,9 @@ def render(grid, options):
             c.translate(-x_offset, -y_offset)
 
     c.save()
+    pdf = ""
+    if not filename:
+        pdf = buffer.getvalue()
+        buffer.close()
+
+    return pdf

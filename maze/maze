@@ -27,7 +27,10 @@ def maze(width=10,
          filename='my_maze.pdf',
          use_A4=True,
          render_to='pdf',
-         dislay_to_screen=False):
+         dislay_to_screen=False,
+         generate_canvas_js=False,
+         generate_js=False,
+         return_pdf=False):
 
     # random, or not
     if _seed is None:
@@ -129,17 +132,44 @@ def maze(width=10,
                       'width': width,
                       'height': height}
 
+    return_data = {}
     # to pdf, if we have a filename
-    if filename:
+    if filename or return_pdf:
+
         # TODO: this import isn't right
-        from src.renderers.pdf import render
-        render(grid, render_options)
+        try:
+            from renderers.pdf import render
+        except ImportError:
+            from maze.renderers.pdf import render  # NOQA
+
+        return_data['pdf'] = render(grid, render_options)
 
     # to screen
     if dislay_to_screen:
-        # TODO: this import isn't right
-        from src.renderers.text import render
+        try:
+            from renderers.text import render
+        except ImportError:
+            from maze.renderers.text import render  # NOQA
+
         render(grid, render_options)
+
+    if generate_canvas_js:
+        try:
+            from renderers.canvas import render
+        except ImportError:
+            from maze.renderers.canvas import render  # NOQA
+
+        return_data['canvas'] = render(grid, render_options)
+
+    if generate_js:
+        try:
+            from renderers.js import render
+        except ImportError:
+            from maze.renderers.js import render  # NOQA
+
+        return_data['js'] = render(grid, render_options)
+
+    return return_data
 
 
 if __name__ == "__main__":
@@ -166,8 +196,16 @@ if __name__ == "__main__":
         help='PDF filename')
 
     parser.add_argument('-t', dest="dislay_to_screen", action='store_true',
-        help='Displays maze as text output (default off)'
-        )
+        help='Displays maze as text output')
+
+    parser.add_argument('-x', dest="generate_canvas_js", action='store_true',
+        help='returns canvas html paths in a python dictionary')
+
+    parser.add_argument('-j', dest="generate_js", action='store_true',
+        help='returns canvas js commands in a python dictonary')
+
+    parser.add_argument('-p', dest="return_pdf", action='store_true',
+        help='returns pdf data in a python dictionary')
 
     args = parser.parse_args()
 
