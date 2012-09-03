@@ -73,12 +73,12 @@ def render(grid, options):
             if (i == width - 1 and j == 0):
                 end = True
 
-            js += "%s(p,%.2f,%.2f,%s,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f," +\
-                        "%.2f,%.2f,%.2f,%.2f,%d,%d);" % (
+            js += ("%s(p,%.2f,%.2f,%s,%.2f,%.2f,%.2f," +
+                   "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%d,%d);") % (
                                        TILES[cell],
                                        x,
                                        y,
-                                       draw_with_curves,
+                                       str(draw_with_curves),
                                        a, b, g, n, r, s, q, v, delta,
                                        theta, start, end)
 
