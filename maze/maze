@@ -1,41 +1,76 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Ported to Python from https://gist.github.com/856138
-# to render to PDF
-#
-# --------------------------------------------------------------------
-# An implementation of a "weave" maze generator. Weave mazes are those
-# with passages that pass both over and under other passages. The
-# technique used in this program was described to me by Robin Houston,
-# and works by first decorating the blank grid with the over/under
-# crossings, and then using Kruskal's algorithm to fill out the rest
-# of the grid. (Kruskal's is very well-suited to this approach, since
-# it treats the cells as separate sets and joins them together.)
-# --------------------------------------------------------------------
+'''
 
-from random import shuffle, seed, randint
-import argparse
+Maze.
+
+An implementation of a "weave" maze generator. Weave mazes are those
+with passages that pass both over and under other passages. The
+technique used in this program was described by Robin Houston,
+and works by first decorating the blank grid with the over/under
+crossings, and then using Kruskal's algorithm to fill out the rest
+of the grid. (Kruskal's is very well-suited to this approach, since
+it treats the cells as separate sets and joins them together.)
+
+Please note: this program was oringally ported from
+https://gist.github.com/856138
+
+Usage:
+  maze -h
+  maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
+  maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
+  maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
+  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
+  maze dict [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
+
+Options:
+  -h, --help           Show this help message and exit
+
+
+  -W --width WIDTH     Number of cells wide [default: 21]
+  -H --height HEIGHT   Number of cells high [default: 30]
+
+  -d --density DENSITY Density of under/overs [default: 50]
+
+  -S                   Draw with straight lines instead of curves
+
+  -p PAGE_SIZE         Page size [default: A4]
+
+
+Examples:
+
+maze pdf my_new_maze.pdf
+
+
+'''
+
+from random import shuffle, randint
 import sys
+from docopt import docopt
 
 
-def maze(width=10,
-         height=10,
-         density=50,
-         _seed=None,
-         draw_with_curves=True,
-         filename='my_maze.pdf',
-         use_A4=True,
-         render_to='pdf',
-         dislay_to_screen=False,
-         generate_canvas_js=False,
-         generate_js=False,
-         return_pdf=False):
+def maze(args):
 
-    # random, or not
-    if _seed is None:
-        _seed = randint(0, 90010000)
-    seed(_seed)
+    width = int(args['--width'])
+    height = int(args['--height'])
+    density = args['--density']
+
+    filename = args['FILENAME']
+
+    use_curves = not args['-S']
+
+    if args['-p'] not in ('A4', 'a4', 'Letter', 'letter'):
+        print 'Page size can only be A4 or Letter'
+        print "e.g.  -p A4"
+        print "You had -p", args['-p']
+        exit(-1)
+
+    use_A4 = True if args['-p'] == 'A4' else False
+
+    return_pdf = args['dict']
+
+    dislay_to_screen = args['text']
+    generate_canvas_js = args['canvas']
+    generate_js = args['javascript']
 
     # constants to aid with describing the passage directions
     N, S, E, W, U = 0x1, 0x2, 0x4, 0x8, 0x10
@@ -127,7 +162,7 @@ def maze(width=10,
 
     # render options
     render_options = {'filename': filename,
-                      'draw_with_curves': draw_with_curves,
+                      'draw_with_curves': use_curves,
                       'use_A4': use_A4,
                       'width': width,
                       'height': height}
@@ -174,45 +209,12 @@ def maze(width=10,
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Generate a maze')
-
-    parser.add_argument('-W', dest="width", type=int,
-        help='width (default=21)', default=21)
-
-    parser.add_argument('-H', dest="height", type=int,
-        help='height (default=30)', default=30)
-
-    parser.add_argument('-D', dest="density", type=int,
-        help='density (default=50)', default=50)
-
-    parser.add_argument('-C', dest="draw_with_curves", type=int,
-        help='Draw with curves -C 1, 0 is all straight lines', default=1)
-
-    parser.add_argument('-A', dest="use_A4", type=int,
-    help='Select A4 page size 1 selects A4 (default), 0 selects 8.5x11 inches',
-        default=1)
-
-    parser.add_argument('-f', dest="filename", type=str, default='',
-        help='PDF filename')
-
-    parser.add_argument('-t', dest="dislay_to_screen", action='store_true',
-        help='Displays maze as text output')
-
-    parser.add_argument('-x', dest="generate_canvas_js", action='store_true',
-        help='returns canvas html paths in a python dictionary')
-
-    parser.add_argument('-j', dest="generate_js", action='store_true',
-        help='returns canvas js commands in a python dictonary')
-
-    parser.add_argument('-p', dest="return_pdf", action='store_true',
-        help='returns pdf data in a python dictionary')
-
-    args = parser.parse_args()
+    sys.setrecursionlimit(100)
 
     if len(sys.argv) == 1:
-        parser.print_help()
+        print __doc__
+        exit()
 
-    else:
-        maze(**vars(args))
+    maze(docopt(__doc__))
 
 #

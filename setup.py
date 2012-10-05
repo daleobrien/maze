@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = '1.2'
+__version__ = '1.3'
 
 description = '''App that generates mazes'''
 
@@ -15,7 +15,8 @@ setup(
     url='https://github.com/daleobrien/maze',
     install_requires=(
         'reportlab',
-        'mako'
+        'mako',
+        'docopt'
     ),
     classifiers=(
         'Development Status :: 5 - Production/Stable',
