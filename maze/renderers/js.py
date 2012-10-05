@@ -1,4 +1,4 @@
-from math import sqrt, asin, pi
+from math import sqrt, asin, pi, ceil
 
 
 # generate some js for a html
@@ -11,11 +11,18 @@ def render(grid, options):
 
     if use_A4:
         page_width = 8.3 * 72
+        page_height = 11.7 * 72
     else:
         page_width = 8.5 * 72
+        page_height = 11.0 * 72
 
     left_margin = 0
     top_margin = 0
+
+    # cells must be square, it's the math!, I'm not doing it again.
+    # so scale the width if the height will go over the page
+    if (float(height) / width) > (page_height / page_width):
+        width = ceil(page_width / page_height * height)
 
     s = (page_width - 2 * left_margin) / width
     g = s * 0.2

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from math import sqrt, asin, pi
+from math import sqrt, asin, pi, ceil
 from reportlab.pdfgen.canvas import Canvas
 from StringIO import StringIO
 
@@ -72,7 +72,20 @@ def render(grid, options):
     left_margin = 15
     top_margin = 15
 
+    # cells must be square, it's the math!, I'm not doing it again.
+    # so scale the width if the height will go over the page
+
+    org_width = width
+    ratio = (page_height - 2 * top_margin) / (page_width - 2 * left_margin)
+    if (float(height) / width > ratio):
+        width = ceil(height / ratio)
+
     s = (page_width - 2 * left_margin) / width
+
+    # center the maze, looks better for mazes that don't fit the page nicely
+    left_margin -= (org_width - width) * s / 2.0
+    top_margin -= (s * height - (page_height - 2.0 * top_margin)) / 2.0
+
     g = s * 0.2
     stroke = s / 7.0
     c.setLineWidth(stroke)
