@@ -23,17 +23,17 @@ Usage:
   maze dict [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
 
 Options:
-  -h, --help           Show this help message and exit
+  -h, --help            Show this help message and exit
 
 
-  -W --width WIDTH     Number of cells wide [default: 21]
-  -H --height HEIGHT   Number of cells high [default: 30]
+  -W --width WIDTH      Number of cells wide [default: 21]
+  -H --height HEIGHT    Number of cells high [default: 30]
 
-  -d --density DENSITY Density of under/overs [default: 50]
+  -d --density DENSITY  Density of under/overs [default: 50]
 
-  -S                   Draw with straight lines instead of curves
+  -S                    Draw with straight lines instead of curves
 
-  -p PAGE_SIZE         Page size [default: A4]
+  -p PAGE_SIZE          Page size [default: A4]
 
 
 Examples:
@@ -52,7 +52,7 @@ def maze(args):
 
     width = int(args['--width'])
     height = int(args['--height'])
-    density = args['--density']
+    density = int(args['--density'])
 
     filename = args['FILENAME']
 
@@ -81,19 +81,35 @@ def maze(args):
     #
     class Tree(object):
 
-        def __init__(self):
-            self.parent = None
+        _children_for_parent = {}
+        _parent_for_child = {}
 
-        def root(self):
-            if self.parent:
-                return self.parent.root()
-            return self
+        def __init__(self):
+
+            Tree._children_for_parent[self] = set()
+            Tree._parent_for_child[self] = self
 
         def connected(self, tree):
-            return(self.root() == tree.root())
+            return (Tree._parent_for_child[self] ==\
+                    Tree._parent_for_child[tree])
 
         def connect(self, tree):
-            tree.root().parent = self
+
+            # find root objs
+            new_parent = Tree._parent_for_child[self]
+            tree_patent = Tree._parent_for_child[tree]
+
+            # move parent
+            Tree._children_for_parent[new_parent].add(tree_patent)
+
+            # move children
+            children = Tree._children_for_parent[tree_patent]
+            Tree._children_for_parent[new_parent] |= children
+            Tree._children_for_parent[tree_patent] = set()
+
+            # move parent for child keys too
+            for child in Tree._children_for_parent[new_parent]:
+                Tree._parent_for_child[child] = new_parent
 
     # structures to hold the maze
     grid = [[0 for x in range(width)] for x in range(height)]
@@ -208,8 +224,6 @@ def maze(args):
 
 
 if __name__ == "__main__":
-
-    sys.setrecursionlimit(100)
 
     if len(sys.argv) == 1:
         print __doc__
