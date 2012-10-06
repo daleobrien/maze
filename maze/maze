@@ -17,7 +17,7 @@ https://gist.github.com/856138
 Usage:
   maze -h
   maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
-  maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
+  maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY]
   maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
   maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
   maze dict [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
