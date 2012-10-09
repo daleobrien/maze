@@ -3,7 +3,7 @@ maze
 
 Maze generator with crossing;
 
-    maze -f my_maze.pdf    
+    maze pdf my_maze.pdf    
 
 will produce a pdf, much like this one by default;
 

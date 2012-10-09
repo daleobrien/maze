@@ -33,7 +33,7 @@ Options:
 
   -S                    Draw with straight lines instead of curves
 
-  -p PAGE_SIZE          Page size [default: A4]
+  -p PAGE_SIZE          Page size, (A4 or Letter) [default: A4]
 
 
 Examples:
