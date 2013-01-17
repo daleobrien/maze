@@ -16,11 +16,11 @@ https://gist.github.com/856138
 
 Usage:
   maze -h
-  maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
-  maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY]
-  maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
-  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
-  maze dict [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S]
+  maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
+  maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L]
+  maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
+  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
+  maze dict [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
 
 Options:
   -h, --help            Show this help message and exit
@@ -30,6 +30,8 @@ Options:
   -H --height HEIGHT    Number of cells high [default: 30]
 
   -d --density DENSITY  Density of under/overs [default: 50]
+
+  -L                    Enable a loop
 
   -S                    Draw with straight lines instead of curves
 
@@ -57,6 +59,7 @@ def maze(args):
     filename = args['FILENAME']
 
     use_curves = not args['-S']
+    add_a_loop = args['-L']
 
     if args['-p'] not in ('A4', 'a4', 'Letter', 'letter'):
         print 'Page size can only be A4 or Letter'
@@ -175,6 +178,23 @@ def maze(args):
             set1.connect(set2)
             grid[y][x] |= direction
             grid[ny][nx] |= OPPOSITE[direction]
+
+    # add in a loop, I just replace a under/over with a cross
+    if add_a_loop:
+        # find all the crossing, if any
+        candiates = []
+        for cy in range(height - 2):
+            cy += 1
+            for cx in range(width - 2):
+                cx += 1
+                if grid[cy][cx] in (U | N | S, U | E | W):
+                    candiates.append((cy, cx))
+
+        # change just one of them to a crossing, e.g. create a loop
+        if len(candiates):
+            shuffle(candiates)
+            cy, cx = candiates[0]
+            grid[cy][cx] = N | S | W | E
 
     # render options
     render_options = {'filename': filename,
