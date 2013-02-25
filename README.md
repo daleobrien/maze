@@ -7,7 +7,7 @@ Maze generator with crossing;
 
 will produce a pdf, much like this one by default;
 
-![Maze](/daleobrien/maze/raw/master/maze.jpg)
+![Maze](maze.jpg)
 
 To see more some maze options, run maze without any arguments.
 
