@@ -9,7 +9,7 @@ will produce a pdf, much like this one by default;
 
 ![Maze](maze.jpg)
 
-To see more some maze options, run maze without any arguments.
+Run maze without any arguments to see all help and options.
 
 Installation
 ===
