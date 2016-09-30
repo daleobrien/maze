@@ -59,14 +59,14 @@ def render(grid, options):
 
     # top left corner
     #print "\x1B[H"
-    print 'Start' + ' ' * len(grid[0]) * 2
+    print('Start' + ' ' * len(grid[0]) * 2)
 
     for z, row in enumerate(grid):
 
-        print ''.join([TILES[r][0] for r in row])
-        print ''.join([TILES[r][1] for r in row]),
+        print(''.join([TILES[r][0] for r in row]))
+        print(''.join([TILES[r][1] for r in row]),)
 
         # bottom right corner ?
-        print 'End' if z == len(grid) - 1 else ''
+        print('End' if z == len(grid) - 1 else '')
 
-    print
+    print()

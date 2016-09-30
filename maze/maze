@@ -62,9 +62,9 @@ def maze(args):
     add_a_loop = args['-L']
 
     if args['-p'] not in ('A4', 'a4', 'Letter', 'letter'):
-        print 'Page size can only be A4 or Letter'
-        print "e.g.  -p A4"
-        print "You had -p", args['-p']
+        print('Page size can only be A4 or Letter')
+        print("e.g.  -p A4")
+        print("You had -p", args['-p'])
         exit(-1)
 
     use_A4 = True if args['-p'] == 'A4' else False
@@ -246,7 +246,7 @@ def maze(args):
 if __name__ == "__main__":
 
     if len(sys.argv) == 1:
-        print __doc__
+        print(__doc__)
         exit()
 
     maze(docopt(__doc__))

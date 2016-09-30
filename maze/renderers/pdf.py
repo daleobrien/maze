@@ -2,7 +2,13 @@
 
 from math import sqrt, asin, pi, ceil
 from reportlab.pdfgen.canvas import Canvas
-from StringIO import StringIO
+try:
+    from io import BytesIO as StringIO
+except ImportError:
+    try:
+        from cStringIO import StringIO
+    except ImportError:
+        from StringIO import StringIO
 
 
 # generate pdf
