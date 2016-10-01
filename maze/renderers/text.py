@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 
 def render(grid, options):
@@ -64,7 +65,7 @@ def render(grid, options):
     for z, row in enumerate(grid):
 
         print(''.join([TILES[r][0] for r in row]))
-        print(''.join([TILES[r][1] for r in row]),)
+        print(''.join([TILES[r][1] for r in row]),  end="")
 
         # bottom right corner ?
         print('End' if z == len(grid) - 1 else '')
