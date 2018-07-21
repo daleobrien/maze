@@ -1,5 +1,6 @@
 maze
 ====
+[![Downloads](http://pepy.tech/badge/maze)](http://pepy.tech/project/maze)
 
 Maze generator with crossing;
 
