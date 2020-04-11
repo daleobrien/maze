@@ -215,7 +215,6 @@ def maze(args):
                       'width': width,
                       'height': height}
 
-    print(render_options)
     grid = create_maze(width, height, density, add_a_loop)
 
     return_data = {}
