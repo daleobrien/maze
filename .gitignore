@@ -34,3 +34,9 @@ maze/package-lock.json
 .venv
 html/maze.js
 maze/maze.pdf
+html/maze.svg
+maze/renderers/js/maze.svg
+maze/renderers/js/maze.js
+maze/renderers/js/index.html
+html/maze.svg
+html/maze.svg

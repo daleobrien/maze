@@ -1,8 +1,9 @@
-from math import sqrt, asin, pi, ceil
-from mako.template import Template
 # generate some a svg for a html
+import os
+from math import asin, ceil, pi, sqrt
 
 import rjsmin
+from mako.template import Template
 
 
 def render(grid, options):
@@ -85,7 +86,8 @@ def render(grid, options):
 
     grid = f"const grid = [{','.join(rows)}]"
 
-    svg_template = open('../html/render.mako.js').read()
+    folder, _ = os.path.split(os.path.realpath(__file__))
+    svg_template = open(os.path.join(folder, 'js/render.mako.js')).read()
 
     js_content = Template(svg_template).render(a=a, b=b, g=g, n=n, r=r, s=s, q=q, v=v, delta=delta,
                                                theta=theta, grid=grid,
