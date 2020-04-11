@@ -11,13 +11,12 @@ except ImportError:
         from StringIO import StringIO
 
 
-# generate pdf
 def render(grid, options):
 
     draw_with_curves = options['draw_with_curves']
     filename = options['filename']
-
     use_A4 = options['use_A4']
+    landscape = options['landscape']
     width = options['width']
     height = options['height']
 
@@ -63,12 +62,16 @@ def render(grid, options):
     c.setSubject("")
     c.setAuthor("Dale O'Brien")
 
+    dpi = 72
     if use_A4:
-        page_width = 8.3 * 72
-        page_height = 11.7 * 72
+        page_width = 8.3 * dpi
+        page_height = 11.7 * dpi
     else:
-        page_width = 8.5 * 72
-        page_height = 11.0 * 72
+        page_width = 8.5 * dpi
+        page_height = 11.0 * dpi
+
+    if landscape:
+        page_width, page_height = page_height, page_width
 
     c.setPageSize((page_width, page_height))
 
@@ -99,14 +102,14 @@ def render(grid, options):
     k = 0.5
 
     n = -(g / k) + 0.5 * (s - sqrt((g *
-        (4.0 * g - 3.0 * g * k + 2 * k * s)) / k))
+                                    (4.0 * g - 3.0 * g * k + 2 * k * s)) / k))
 
     r = g / k
     q = n + r
     v = (g * (-1 + k)) / k
 
     theta = asin((2.0 * g - 2.0 * g * k + k * s) /
-        (2.0 * g - g * k + k * s)) * 180 / pi
+                 (2.0 * g - g * k + k * s)) * 180 / pi
 
     delta = theta - 90
 
@@ -118,27 +121,24 @@ def render(grid, options):
             y_offset = top_margin + j * s
 
             c.translate(x_offset, y_offset)
+            c.setStrokeColorRGB(0.0, 0.0, 0.0)
             p = c.beginPath()
 
             a = g
             b = s - g
 
             # mark start and end
-            start = False
-            end = False
-            if (i == 0 and j == height - 1):
-                start = True
-
-            if (i == width - 1 and j == 0):
-                end = True
+            start = (i == 0 and j == height - 1)
+            end = (i == org_width - 1 and j == 0)
 
             if start or end:
+
                 c.setStrokeColorRGB(0.9, 0.1, 0.1)
                 c.setFillColorRGB(0.9, 0.1, 0.1)
                 p.circle(s / 2.0, s / 2.0, g / 1.5)
                 c.drawPath(p, fill=True)
+
                 p = c.beginPath()
-                c.setStrokeColorRGB(0.0, 0.0, 0.0)
 
             if cell == 3:
 
