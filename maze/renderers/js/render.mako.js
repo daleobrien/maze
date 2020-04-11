@@ -1,9 +1,9 @@
 'use strict';
 
-const π = Math.PI;
-const π1_2 = π / 2;
-const π3_2 = 3 * π / 2;
-const π2 = 2 * π;
+const Pi = Math.PI;
+const Pi1_2 = Pi / 2;
+const Pi3_2 = 3 * Pi / 2;
+const Pi2 = 2 * Pi;
 const W = ${width};
 const H = ${height};
 const A = ${a};
@@ -14,8 +14,8 @@ const R = ${r};
 const S = ${s};
 const Q = ${q};
 const V = ${v};
-const Δ = ${delta};
-const θ = ${theta};
+const D = ${delta};
+const T = ${theta};
 ${s_x_s};
 ${s_y_s};
 
@@ -40,7 +40,7 @@ class SVG {
   }
 
   posAngle(angle) {
-    return angle < 0 ? angle + π2 : angle;
+    return angle < 0 ? angle + Pi2 : angle;
   }
 
   polar(x, y, radius, angle) {
@@ -58,7 +58,7 @@ class SVG {
     const end = this.polar(x, y, radius, _end);
 
     const diff = _end - _start;
-    const largeArcFlag = 0 < diff && diff <= π ? 1 - dir : dir;
+    const largeArcFlag = 0 < diff && diff <= Pi ? 1 - dir : dir;
 
     this.svg += [
       'L', start.x.toFixed(2), ' ', start.y.toFixed(2), ' A', radius.toFixed(2),
@@ -81,28 +81,28 @@ let p = new SVG();
 const s0 =
     (x, y) => {
       p.m(x + A, y);
-      p.a(x, y, A, 0, π1_2);
+      p.a(x, y, A, 0, Pi1_2);
       p.l(x, y + A);
     }
 
 const s1 =
     (x, y) => {
       p.m(x, y + B);
-      p.a(x, y + S, A, π3_2, π2);
+      p.a(x, y + S, A, Pi3_2, Pi2);
       p.l(x + A, y + S);
     }
 
 const s2 =
     (x, y) => {
       p.m(x + S, y + A);
-      p.a(x + S, y, A, π1_2, π);
+      p.a(x + S, y, A, Pi1_2, Pi);
       p.l(x + B, y);
     }
 
 const s3 =
     (x, y) => {
       p.m(x + S, y + B);
-      p.a(x + S, y + S, A, π3_2, π, 0);
+      p.a(x + S, y + S, A, Pi3_2, Pi, 0);
       p.l(x + B, y + S);
     }
 
@@ -112,11 +112,11 @@ const c1 =
       p.m(x + B, y);
       p.l(x + B, y + Q);
 
-      p.a(x + S - V, y + n + R, R, π, π + Δ, 0);
+      p.a(x + S - V, y + n + R, R, Pi, Pi + D, 0);
 
-      p.a(x + S / 2, y + S / 2, S / 2 - G / 2, θ - π1_2, π3_2 - θ);
+      p.a(x + S / 2, y + S / 2, S / 2 - G / 2, T - Pi1_2, Pi3_2 - T);
 
-      p.a(x + V, y + n + R, R, π1_2 - θ, π3_2 + θ - Δ, 0);
+      p.a(x + V, y + n + R, R, Pi1_2 - T, Pi3_2 + T - D, 0);
 
       p.l(x + G, y);
     }
@@ -124,9 +124,9 @@ const c1 =
 const c2 =
     (x, y) => {
       p.m(x + B, y + S);
-      p.a(x + S - V, y + S - n - R, R, π, π - Δ);
-      p.a(x + S / 2, y + S / 2, S / 2 - G / 2, π1_2 - θ, θ - π3_2, 0);
-      p.a(x + V, y + S - n - R, R, π3_2 + θ, π3_2 + θ - Δ, 1);
+      p.a(x + S - V, y + S - n - R, R, Pi, Pi - D);
+      p.a(x + S / 2, y + S / 2, S / 2 - G / 2, Pi1_2 - T, T - Pi3_2, 0);
+      p.a(x + V, y + S - n - R, R, Pi3_2 + T, Pi3_2 + T - D, 1);
 
       p.l(x + A, y + S);
     }
@@ -143,9 +143,9 @@ const c4 =
     (x, y) => {
       p.m(x + S, y + B);
 
-      p.a(x + S - n - R, y + S - V, R, π3_2, π3_2 + Δ, 0);
-      p.a(x + S / 2, y + S / 2, S / 2 - G / 2, π1_2 + Δ, π1_2 + Δ - 2 * θ);
-      p.a(x + S - n - R, y + V, R, π - θ, π - θ + Δ, 0);
+      p.a(x + S - n - R, y + S - V, R, Pi3_2, Pi3_2 + D, 0);
+      p.a(x + S / 2, y + S / 2, S / 2 - G / 2, Pi1_2 + D, Pi1_2 + D - 2 * T);
+      p.a(x + S - n - R, y + V, R, Pi - T, Pi - T + D, 0);
       p.l(x + S, y + A);
     }
 
@@ -155,7 +155,7 @@ const c5 =
       s2(x, y);
 
       p.m(x + S, y + B);
-      p.a(x + B, y + A, B - A, π1_2, π);
+      p.a(x + B, y + A, B - A, Pi1_2, Pi);
       p.l(x + A, y);
     }
 
@@ -164,7 +164,7 @@ const c6 =
       s3(x, y);
 
       p.m(x + S, y + A);
-      p.a(x + A + B, y + A + B, B, π3_2, π, 0);
+      p.a(x + A + B, y + A + B, B, Pi3_2, Pi, 0);
       p.l(x + A, y + S);
     }
 
@@ -180,9 +180,9 @@ const c7 =
 const c8 =
     (x, y) => {
       p.m(x, y + B);
-      p.a(x + n + R, y + S - V, R, π3_2, π3_2 - Δ);
-      p.a(x + S / 2, y + S / 2, S / 2 - G / 2, π1_2 - Δ, π1_2 - Δ + 2 * θ, 0);
-      p.a(x + n + R, y + V, R, θ, θ - Δ);
+      p.a(x + n + R, y + S - V, R, Pi3_2, Pi3_2 - D);
+      p.a(x + S / 2, y + S / 2, S / 2 - G / 2, Pi1_2 - D, Pi1_2 - D + 2 * T, 0);
+      p.a(x + n + R, y + V, R, T, T - D);
       p.l(x, y + A);
     }
 
@@ -190,7 +190,7 @@ const c9 =
     (x, y) => {
       s0(x, y);
       p.m(x + B, y);
-      p.a(x + A, y + A, B - A, 0, π1_2);
+      p.a(x + A, y + A, B - A, 0, Pi1_2);
       p.l(x, y + B);
     }
 
@@ -198,7 +198,7 @@ const ca =
     (x, y) => {
       s1(x, y);
       p.m(x, y + A);
-      p.a(x + A, y + B, B - A, π3_2, π2);
+      p.a(x + A, y + B, B - A, Pi3_2, Pi2);
       p.l(x + B, y + S);
     }
 
