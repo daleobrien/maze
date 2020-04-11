@@ -14,6 +14,6 @@ Run maze without any arguments to see all help and options.
 
 Installation
 ===
-    pip install maze
+    pip3 install maze
 
 
