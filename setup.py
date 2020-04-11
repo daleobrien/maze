@@ -7,7 +7,6 @@ description = '''App that generates mazes'''
 setup(
     name='maze',
     packages=find_packages(),
-    package_data={'': ['maze/renderers/js/render.mako.js']},
     include_package_data=True,
     scripts=('maze/maze',),
     version=__version__,
