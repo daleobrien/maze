@@ -27,3 +27,10 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+maze/a.pdf
+maze/maze.js
+maze/node_modules
+maze/package-lock.json
+.venv
+html/maze.js
+maze/maze.pdf

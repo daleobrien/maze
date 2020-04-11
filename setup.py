@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = '1.3'
+__version__ = '2.0.0'
 
 description = '''App that generates mazes'''
 
@@ -16,13 +16,13 @@ setup(
     install_requires=(
         'reportlab',
         'mako',
-        'docopt'
+        'docopt',
+        'rjsmin'
     ),
     classifiers=(
         'Development Status :: 5 - Production/Stable',
         'Natural Language :: English',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 3.7'
     )
 )

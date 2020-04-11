@@ -16,26 +16,27 @@ https://gist.github.com/856138
 
 Usage:
   maze -h
-  maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
+  maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-O ORIENTATION]
   maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L]
-  maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
-  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
-  maze dict [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
+  maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME]
+  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME]
+  maze svg [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME]
+  maze data [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
 
 Options:
-  -h, --help            Show this help message and exit
+  -h, --help                    Show this help message and exit
 
+  -W --width WIDTH              Number of cells wide [default: 21]
+  -H --height HEIGHT            Number of cells high [default: 30]
 
-  -W --width WIDTH      Number of cells wide [default: 21]
-  -H --height HEIGHT    Number of cells high [default: 30]
+  -d --density DENSITY          Density of under/overs [default: 50]
 
-  -d --density DENSITY  Density of under/overs [default: 50]
+  -L                            Enable a loop
 
-  -L                    Enable a loop
+  -S                            Draw with straight lines instead of curves
 
-  -S                    Draw with straight lines instead of curves
-
-  -p PAGE_SIZE          Page size, (A4 or Letter) [default: A4]
+  -p PAGE_SIZE                  Page size, (A4 or Letter) [default: A4]
+  -O --orientation ORIENTATION  Orientation, P=portrait, L=landscape [default: P]
 
 
 Examples:
@@ -45,74 +46,53 @@ maze pdf my_new_maze.pdf
 
 '''
 
-from random import shuffle, randint
+from random import shuffle, randint, seed
 import sys
 from docopt import docopt
 
+# constants to aid with describing the passage directions
+N, S, E, W, U = 0x1, 0x2, 0x4, 0x8, 0x10
+DX = {E: 1, W: -1, N: 0, S: 0}
+DY = {E: 0, W:  0, N: -1, S: 1}
+OPPOSITE = {E: W, W: E, N: S, S: N}
 
-def maze(args):
+#
 
-    width = int(args['--width'])
-    height = int(args['--height'])
-    density = int(args['--density'])
 
-    filename = args['FILENAME']
+class Tree(object):
 
-    use_curves = not args['-S']
-    add_a_loop = args['-L']
+    _children_for_parent = {}
+    _parent_for_child = {}
 
-    if args['-p'] not in ('A4', 'a4', 'Letter', 'letter'):
-        print('Page size can only be A4 or Letter')
-        print("e.g.  -p A4")
-        print("You had -p", args['-p'])
-        exit(-1)
+    def __init__(self):
 
-    use_A4 = True if args['-p'] == 'A4' else False
+        Tree._children_for_parent[self] = set()
+        Tree._parent_for_child[self] = self
 
-    return_pdf = args['dict']
+    def connected(self, tree):
+        return (Tree._parent_for_child[self] ==
+                Tree._parent_for_child[tree])
 
-    dislay_to_screen = args['text']
-    generate_canvas_js = args['canvas']
-    generate_js = args['javascript']
+    def connect(self, tree):
 
-    # constants to aid with describing the passage directions
-    N, S, E, W, U = 0x1, 0x2, 0x4, 0x8, 0x10
-    DX = {E: 1, W: -1, N: 0, S: 0}
-    DY = {E: 0, W:  0, N: -1, S: 1}
-    OPPOSITE = {E: W, W: E, N: S, S: N}
+        # find root objs
+        new_parent = Tree._parent_for_child[self]
+        tree_patent = Tree._parent_for_child[tree]
 
-    #
-    class Tree(object):
+        # move parent
+        Tree._children_for_parent[new_parent].add(tree_patent)
 
-        _children_for_parent = {}
-        _parent_for_child = {}
+        # move children
+        children = Tree._children_for_parent[tree_patent]
+        Tree._children_for_parent[new_parent] |= children
+        Tree._children_for_parent[tree_patent] = set()
 
-        def __init__(self):
+        # move parent for child keys too
+        for child in Tree._children_for_parent[new_parent]:
+            Tree._parent_for_child[child] = new_parent
 
-            Tree._children_for_parent[self] = set()
-            Tree._parent_for_child[self] = self
 
-        def connected(self, tree):
-            return (Tree._parent_for_child[self] ==\
-                    Tree._parent_for_child[tree])
-
-        def connect(self, tree):
-
-            # find root objs
-            new_parent = Tree._parent_for_child[self]
-            tree_patent = Tree._parent_for_child[tree]
-
-            # move parent
-            Tree._children_for_parent[new_parent].add(tree_patent)
-
-            # move children
-            children = Tree._children_for_parent[tree_patent]
-            Tree._children_for_parent[new_parent] |= children
-            Tree._children_for_parent[tree_patent] = set()
-
-            # move parent for child keys too
-            for child in Tree._children_for_parent[new_parent]:
-                Tree._parent_for_child[child] = new_parent
+def create_maze(width, height, density, add_a_loop):
 
     # structures to hold the maze
     grid = [[0 for x in range(width)] for x in range(height)]
@@ -145,7 +125,7 @@ def maze(args):
 
             if (grid[cy][cx] != 0 or
                 sets[ny][nx].connected(sets[sy][sx]) or
-                sets[ey][ex].connected(sets[wy][wx])):
+                    sets[ey][ex].connected(sets[wy][wx])):
                 continue
 
             sets[ny][nx].connect(sets[sy][sx])
@@ -162,9 +142,9 @@ def maze(args):
             grid[sy][sx] |= N
 
             edges[:] = [(x, y, d) for (x, y, d) in edges if not (
-              (x == cx and y == cy) or
-              (x == ex and y == ey and d == W) or
-              (x == sx and y == sy and d == N)
+                (x == cx and y == cy) or
+                (x == ex and y == ey and d == W) or
+                (x == sx and y == sy and d == N)
             )]
 
     # Kruskal's algorithm
@@ -196,18 +176,52 @@ def maze(args):
             cy, cx = candiates[0]
             grid[cy][cx] = N | S | W | E
 
+    return grid
+
+
+def maze(args):
+
+    width = int(args['--width'])
+    height = int(args['--height'])
+    density = int(args['--density'])
+
+    filename = args['FILENAME']
+
+    add_a_loop = args['-L']
+
+    if args['-p'] not in ('A4', 'a4', 'Letter', 'letter'):
+        print('Page size can only be A4 or Letter')
+        print("e.g.  -p A4")
+        print("You had -p", args['-p'])
+        exit(-1)
+
+    use_A4 = True if args['-p'] == 'A4' else False
+
+    dislay_to_screen = args['text']
+    generate_canvas_js = args['canvas']
+    generate_js = args['javascript']
+    generate_svg = args['svg']
+    generate_data = args['data']
+    generate_pdf = args['pdf']
+
+    if generate_data:
+        filename = "maze.pdf"
+
     # render options
     render_options = {'filename': filename,
-                      'draw_with_curves': use_curves,
+                      'draw_with_curves': not args['-S'],
                       'use_A4': use_A4,
+                      'landscape': args['--orientation'] == 'L',
                       'width': width,
                       'height': height}
 
+    print(render_options)
+    grid = create_maze(width, height, density, add_a_loop)
+
     return_data = {}
     # to pdf, if we have a filename
-    if filename or return_pdf:
+    if filename and generate_data or generate_pdf:
 
-        # TODO: this import isn't right
         try:
             from renderers.pdf import render
         except ImportError:
@@ -231,14 +245,31 @@ def maze(args):
             from maze.renderers.canvas import render  # NOQA
 
         return_data['canvas'] = render(grid, render_options)
+        if filename and not generate_data:
+            with open(filename, 'w') as f:
+                f.write(return_data['canvas'])
 
-    if generate_js:
+    if generate_js or generate_data:
         try:
             from renderers.js import render
         except ImportError:
             from maze.renderers.js import render  # NOQA
 
         return_data['js'] = render(grid, render_options)
+        if filename and not generate_data:
+            with open(filename, 'w') as f:
+                f.write(return_data['js'])
+
+    if generate_svg or generate_data:
+        try:
+            from renderers.svg import render
+        except ImportError:
+            from maze.renderers.svg import render  # NOQA
+
+        return_data['svg'] = render(grid, render_options)
+        if filename and not generate_data:
+            with open(filename, 'w') as f:
+                f.write(return_data['svg'])
 
     return return_data
 
