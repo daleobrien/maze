@@ -279,6 +279,7 @@ if __name__ == "__main__":
         print(__doc__)
         exit()
 
+    # seed(0)
     maze(docopt(__doc__))
 
 #

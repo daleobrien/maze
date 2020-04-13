@@ -52,11 +52,15 @@ def render(grid, options):
 
     # inside loop
     a = g
-    b = s - g
+    a2 = a / 2.0
+    b = s - a
+    b2 = s - a2
+    r4 = s / 2.0 - a
 
     TILES = {1: 'c1', 2: 'c2', 3: 'c3', 4: 'c4', 5: 'c5', 6: 'c6',
              7: 'c7', 8: 'c8', 9: 'c9', 10: 'ca', 11: 'cb', 12: 'cc',
              13: 'cd', 14: 'ce', 15: 'cf', 19: 'cg', 28: 'ch'}
+    ports = {'c1': 1}
 
     js = ""
 
@@ -89,8 +93,8 @@ def render(grid, options):
     folder, _ = os.path.split(os.path.realpath(__file__))
     svg_template = open(os.path.join(folder, 'js/render.mako.js')).read()
 
-    js_content = Template(svg_template).render(a=a, b=b, g=g, n=n, r=r, s=s, q=q, v=v, delta=delta,
-                                               theta=theta, grid=grid,
+    js_content = Template(svg_template).render(a=a, a2=a2, b=b, b2=b2, g=g, n=n, r=r, s=s, q=q, v=v, delta=delta,
+                                               theta=theta, grid=grid, s2=s/2.0, r2=b-a, r3=(s/2.0-a/2.0), r4=r4,
                                                width=options['width'], height=height, s_x_s=s_x_s, s_y_s=s_y_s)
 
     js_content = rjsmin.jsmin(js_content)
