@@ -10,11 +10,11 @@ Maze generator with crossing;
 
 will produce a pdf, much like this one by default;
 
-![Maze](maze.png | width=200)
+![Maze](maze.png)
 
 And corresponding solution:
 
-![Solution](maze-solved.png | width=200)
+![Solution](maze-solved.png)
 
 Run maze without any arguments to see all help and options.
 
