@@ -43,12 +43,14 @@ class SVG {
     this.opacity = opacity;
   }
 
-  path = () => ['<path opacity="', this.opacity, '", stroke-width="',
-                this.stroke_width, '" stroke="', this.colour, '" d="', this.svg,
-                ' "></path>', this.dots]
-                   .join('');
+  path() {
+    return [
+      '<path opacity="', this.opacity, '", stroke-width="', this.stroke_width,
+      '" stroke="', this.colour, '" d="', this.svg, ' "></path>', this.dots
+    ].join('')
+  };
 
-  dot = (x, y, radius = S / 3) => {
+  dot(x, y, radius = S / 3) {
     const _x = x + S2;
     const _y = y + S2;
 
@@ -56,12 +58,15 @@ class SVG {
         '" fill-opacity="1.0" stroke-opacity="0" fill="#E51919" />';
   };
 
-  posAngle = (angle) => angle < 0 ? angle + Pi2 : angle;
+  posAngle(angle) {
+    return angle < 0 ? angle + Pi2 : angle
+  };
 
-  polar = (x, y, radius, angle) =>
-      [x + (radius * Math.cos(angle)), y + (radius * Math.sin(angle))];
+  polar(x, y, radius, angle) {
+    return [x + (radius * Math.cos(angle)), y + (radius * Math.sin(angle))]
+  };
 
-  a = (x, y, radius, startAngle, endAngle, dir = 1) => {
+  a(x, y, radius, startAngle, endAngle, dir = 1) {
     const _s = this.posAngle(startAngle);
     const _e = this.posAngle(endAngle);
 
@@ -77,19 +82,31 @@ class SVG {
     ].join('');
   };
 
-  m = (x, y) => this.svg += ['M', x, ' ', y, ' '].join('');
-  l = (x, y) => this.svg += ['L', x, ' ', y, ' '].join('');
+  m(x, y) {
+    this.svg += ['M', x, ' ', y, ' '].join('')
+  };
+  l(x, y) {
+    this.svg += ['L', x, ' ', y, ' '].join('')
+  };
 
-  ml = (a, b, c, d) => {
+  ml(a, b, c, d) {
     this.m(a, b);
     this.l(c, d);
   };
 
-  mh = (a, b, x) => this.ml(a, b, a + x, b);
-  mv = (a, b, y) => this.ml(a, b, a, b + y);
+  mh(a, b, x) {
+    this.ml(a, b, a + x, b)
+  };
+  mv(a, b, y) {
+    this.ml(a, b, a, b + y)
+  };
 
-  h = (x, y, v) => this.ml(x, y + v, x + S, y + v);
-  v = (x, y, h) => this.ml(x + h, y, x + h, y + S);
+  h(x, y, v) {
+    this.ml(x, y + v, x + S, y + v)
+  };
+  v(x, y, h) {
+    this.ml(x + h, y, x + h, y + S)
+  };
 };
 
 // Maze walls
