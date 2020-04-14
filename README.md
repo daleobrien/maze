@@ -2,7 +2,7 @@ maze
 ====
 [![Downloads](http://pepy.tech/badge/maze)](http://pepy.tech/project/maze)
 
-[Website](https://maze.do.id.au/new?level=medium)
+[Website](https://maze.do.id.au/?level=medium)
 
 Maze generator with crossing;
 
