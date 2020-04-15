@@ -225,7 +225,7 @@ def maze(args):
 
     grid = create_maze(width, height, density, add_a_loop)
 
-    return_data = {'maze_id': f"'{maze_id}'"}
+    return_data = {'maze_id': f"{maze_id}"}
 
     # to pdf, if we have a filename
     if filename and generate_data or generate_pdf:
