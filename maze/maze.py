@@ -16,12 +16,12 @@ https://gist.github.com/856138
 
 Usage:
   maze -h
-  maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-O ORIENTATION]
-  maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L]
-  maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME]
-  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME]
-  maze svg [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME]
-  maze data [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L]
+  maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-O ORIENTATION] [-i MAZE_ID]
+  maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-i MAZE_ID]
+  maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME] [-i MAZE_ID]
+  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME] [-i MAZE_ID]
+  maze svg [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME] [-i MAZE_ID]
+  maze data [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-i MAZE_ID]
 
 Options:
   -h, --help                    Show this help message and exit
@@ -38,16 +38,18 @@ Options:
   -p PAGE_SIZE                  Page size, (A4 or Letter) [default: A4]
   -O --orientation ORIENTATION  Orientation, P=portrait, L=landscape [default: P]
 
+  -i --maze_id MAZE_ID          Text used to identify which maze otherwise a random maze will be generated
 
 Examples:
 
 maze pdf my_new_maze.pdf
 
-
 '''
 
-from random import shuffle, randint, seed
 import sys
+import uuid
+from random import randint, seed, shuffle
+
 from docopt import docopt
 
 # constants to aid with describing the passage directions
@@ -185,6 +187,12 @@ def maze(args):
     height = int(args['--height'])
     density = int(args['--density'])
 
+    # allow the same maze to be generated
+    maze_id = args.get('--maze_id', None)
+    if maze_id is None:
+        maze_id = uuid.uuid4()
+    seed(f"{maze_id}")
+
     filename = args['FILENAME']
 
     add_a_loop = args['-L']
@@ -217,7 +225,8 @@ def maze(args):
 
     grid = create_maze(width, height, density, add_a_loop)
 
-    return_data = {}
+    return_data = {'maze_id': f"'{maze_id}'"}
+
     # to pdf, if we have a filename
     if filename and generate_data or generate_pdf:
 

@@ -585,11 +585,11 @@ const processMovement = (key_code) => {
 const drawShape = () => {
   let c = document.getElementById('maze');
 
-  c.setAttribute('width', W * S + S);
-  c.setAttribute('height', H * S + S);
+  c.setAttribute('width', W * S);
+  c.setAttribute('height', H * S);
 
   document.getElementById('inner').setAttribute(
-      'style', 'width:' + W * S + 'px');
+      'style', 'height:' + H * S + 'px;width:' + W * S + 'px');
 
   const I = x_s.length;
   const J = y_s.length;
