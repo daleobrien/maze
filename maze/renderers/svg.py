@@ -21,6 +21,7 @@ class SVG(object):
         width = options['width']
         height = options['height']
         use_A4 = options['use_A4']
+        self.draw_with_curves = options['draw_with_curves']
 
         dpi = 72
         if use_A4:
@@ -148,102 +149,153 @@ class SVG(object):
 
     def s_shape_00(self, x, y):
         self.moveTo(x + self.A, y)
-        self.arc(x, y, self.A, 0, QUARTER, False)
+        if self.draw_with_curves:
+            self.arc(x, y, self.A, 0, QUARTER, False)
+        else:
+            self.lineTo(x + self.A, y + self.A)
         self.lineTo(x, y + self.A)
 
     def s_shape_01(self, x, y):
         self.moveTo(x, y + self.B)
-        self.arc(x, y + self.S, self.A, THREE_QUARTER, FULL, False)
+        if self.draw_with_curves:
+            self.arc(x, y + self.S, self.A, THREE_QUARTER, FULL, False)
+        else:
+            self.lineTo(x + self.A, y + self.B)
         self.lineTo(x + self.A, y + self.S)
 
     def s_shape_10(self, x, y):
         self.moveTo(x + self.S, y + self.A)
-        self.arc(x + self.S, y, self.A, QUARTER, HALF, False)
+        if self.draw_with_curves:
+            self.arc(x + self.S, y, self.A, QUARTER, HALF, False)
+        else:
+            self.lineTo(x + self.B, y + self.A)
         self.lineTo(x + self.B, y)
 
     def s_shape_11(self, x, y):
         self.moveTo(x + self.S, y + self.B)
-        self.arc(x + self.S, y + self.S, self.A, THREE_QUARTER, HALF, True)
+        if self.draw_with_curves:
+            self.arc(x + self.S, y + self.S, self.A, THREE_QUARTER, HALF, True)
+        else:
+            self.lineTo(x + self.B, y + self.B)
         self.lineTo(x + self.B, y + self.S)
 
     def c1(self, x, y):
+
+        '│ │'
+        '└─┘'
+
         self.moveTo(x + self.B, y)
-        self.lineTo(x + self.B, y + self.Q)
+        if self.draw_with_curves:
+            self.lineTo(x + self.B, y + self.Q)
 
-        self.arc(x + self.S - self.V, y + self.N + self.R,
-                 self.R, HALF, HALF + self.delta, True)
+            self.arc(x + self.S - self.V, y + self.N + self.R,
+                     self.R, HALF, HALF + self.delta, True)
 
-        self.arc(
-            x + self.S / 2, y + self.S / 2, self.S / 2 -
-            self.G / 2, self.theta - QUARTER,
-            THREE_QUARTER - self.theta, False)
+            self.arc(
+                x + self.S / 2, y + self.S / 2, self.S / 2 -
+                self.G / 2, self.theta - QUARTER,
+                THREE_QUARTER - self.theta, False)
 
-        self.arc(
-            x + self.V, y + self.N + self.R, self.R, QUARTER -
-            self.theta, THREE_QUARTER + self.theta - self.delta,
-            True)
+            self.arc(
+                x + self.V, y + self.N + self.R, self.R, QUARTER -
+                self.theta, THREE_QUARTER + self.theta - self.delta,
+                True)
+        else:
+           self.lineTo(x + self.B, y + self.B) 
+           self.lineTo(x + self.A, y + self.B) 
+
         self.lineTo(x + self.G, y)
 
     def c2(self, x, y):
-        self.moveTo(x + self.B, y + self.S)
-        self.arc(x + self.S - self.V, y + self.S - self.N -
-                 self.R, self.R, HALF, HALF - self.delta, False)
-        self.arc(
-            x + self.S / 2, y + self.S / 2, self.S / 2 - self.G /
-            2, QUARTER - self.theta, self.theta - THREE_QUARTER,
-            True)
-        self.arc(
-            x + self.V, y + self.S - self.N - self.R, self.R, THREE_QUARTER + self.theta,
-            THREE_QUARTER + self.theta - self.delta, False)
 
+        '┌─┐'
+        '│ │'
+
+        self.moveTo(x + self.B, y + self.S)
+        if self.draw_with_curves:
+            self.arc(x + self.S - self.V, y + self.S - self.N -
+                 self.R, self.R, HALF, HALF - self.delta, False)
+            self.arc(
+                x + self.S / 2, y + self.S / 2, self.S / 2 - self.G /
+                2, QUARTER - self.theta, self.theta - THREE_QUARTER,
+                True)
+            self.arc(
+                x + self.V, y + self.S - self.N - self.R, self.R, THREE_QUARTER + self.theta,
+                THREE_QUARTER + self.theta - self.delta, False)
+        else:
+            self.lineTo(x + self.B, y + self.A)
+            self.lineTo(x + self.A, y + self.A)
         self.lineTo(x + self.A, y + self.S)
+            
 
     def c3(self, x, y):
+
+        '│ │'
+        '│ │'
+
         self.moveTo(x + self.A, y + self.S)
         self.lineTo(x + self.A, y)
         self.moveTo(x + self.B, y + self.S)
         self.lineTo(x + self.B, y)
 
     def c4(self, x, y):
+
+        '┌──'
+        '└──'
+
         self.moveTo(x + self.S, y + self.B)
-
-        self.arc(
-            x + self.S - self.N - self.R, y + self.S - self.V, self.R, THREE_QUARTER, THREE_QUARTER + self.delta, True)
-        self.arc(
-            x + self.S / 2, y + self.S / 2, self.S / 2 -
-            self.G / 2, QUARTER + self.delta,
-            QUARTER + self.delta - 2 * self.theta, False)
-        self.arc(x + self.S - self.N - self.R, y + self.V, self.R, HALF -
-                 self.theta, HALF - self.theta + self.delta, True)
-
+        if self.draw_with_curves:
+            self.arc(
+                x + self.S - self.N - self.R, y + self.S - self.V, self.R, 
+                THREE_QUARTER, THREE_QUARTER + self.delta, True)
+            self.arc(
+                x + self.S / 2, y + self.S / 2, self.S / 2 -
+                self.G / 2, QUARTER + self.delta,
+                QUARTER + self.delta - 2 * self.theta, False)
+            self.arc(
+                x + self.S - self.N - self.R, y + self.V, self.R, HALF -
+                self.theta, HALF - self.theta + self.delta, True)
+        else:
+            self.lineTo(x + self.G, y + self.B)
+            self.lineTo(x + self.A, y + self.A)
         self.lineTo(x + self.S, y + self.A)
 
     def c5(self, x, y):
+
+        '│ └'
+        '└──'
+
         self.s_shape_10(x, y)
 
         self.moveTo(x + self.S, y + self.B)
-        self.arc(x + self.B, y + self.A, self.B -
-                 self.A, QUARTER, HALF, False)
-        self.lineTo(x + self.A, y)
-
-    def c5_start(self, x, y):
-        self.s_shape_10(x, y)
-
-        self.moveTo(x + self.S, y + self.B)
-        self.arc(x + (A + self.B) / 2, y + (A + self.B) / 2,
-                 (B - self.A) / 2, QUARTER, HALF, False)
+        if self.draw_with_curves:
+            self.arc(x + self.B, y + self.A, self.B -
+                     self.A, QUARTER, HALF, False)
+        else:
+            self.lineTo(x + self.A, y + self.B)
 
         self.lineTo(x + self.A, y)
 
     def c6(self, x, y):
+
+        '┌──'
+        '│ ┌'
+
         self.s_shape_11(x, y)
 
         self.moveTo(x + self.S, y + self.A)
-        self.arc(x + self.A + self.B, y + self.A + self.B,
-                 self.B, THREE_QUARTER, HALF, True)
+        if self.draw_with_curves:
+            self.arc(x + self.A + self.B, y + self.A + self.B,
+                     self.B, THREE_QUARTER, HALF, True)
+        else:
+            self.lineTo(x + self.A, y + self.A)
         self.lineTo(x + self.A, y + self.S)
 
     def c7(self, x, y):
+
+        '│ └'
+        '│ ┌'
+
         self.moveTo(x + self.A, y + self.S)
         self.lineTo(x + self.A, y)
 
@@ -251,32 +303,55 @@ class SVG(object):
         self.s_shape_11(x, y)
 
     def c8(self, x, y):
+
+        '──┐'
+        '──┘'
+
         self.moveTo(x, y + self.B)
-        self.arc(x + self.N + self.R, y + self.S - self.V, self.R, THREE_QUARTER,
-                 THREE_QUARTER - self.delta, False)
-        self.arc(
-            x + self.S / 2, y + self.S / 2, self.S / 2 -
-            self.G / 2, QUARTER - self.delta,
-            QUARTER - self.delta + 2 * self.theta, True)
-        self.arc(x + self.N + self.R, y + self.V, self.R,
-                 self.theta, self.theta - self.delta, False)
+        if self.draw_with_curves:
+            self.arc(x + self.N + self.R, y + self.S - self.V, self.R, THREE_QUARTER,
+                    THREE_QUARTER - self.delta, False)
+            self.arc(
+                x + self.S / 2, y + self.S / 2, self.S / 2 -
+                self.G / 2, QUARTER - self.delta,
+                QUARTER - self.delta + 2 * self.theta, True)
+            self.arc(x + self.N + self.R, y + self.V, self.R,
+                    self.theta, self.theta - self.delta, False)
+        else:
+            self.lineTo(x + self.B, y + self.B)
+            self.lineTo(x + self.B, y + self.A)
 
         self.lineTo(x, y + self.A)
 
     def c9(self, x, y):
+
+        '┘ │'
+        '──┘'
+
         self.s_shape_00(x, y)
 
         self.moveTo(x + self.B, y)
-        self.arc(x + self.A, y + self.A, self.B -
-                 self.A, 0, QUARTER, False)
+        if self.draw_with_curves:
+            self.arc(x + self.A, y + self.A, self.B -
+                    self.A, 0, QUARTER, False)
+        else:
+            self.lineTo(x +self.B, y + self.B)
+
         self.lineTo(x, y + self.B)
 
     def ca(self, x, y):
+
+        '──┐'
+        '┐ │'
+
         self.s_shape_01(x, y)
 
         self.moveTo(x, y + self.A)
-        self.arc(x + self.A, y + self.B, self.B -
-                 self.A, THREE_QUARTER, FULL, False)
+        if self.draw_with_curves:
+            self.arc(x + self.A, y + self.B, self.B -
+                     self.A, THREE_QUARTER, FULL, False)
+        else:
+            self.lineTo(x + self.B, y + self.A)
         self.lineTo(x + self.B, y + self.S)
 
     def cb(self, x, y):

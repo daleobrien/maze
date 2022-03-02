@@ -19,8 +19,8 @@ Usage:
   maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-O ORIENTATION] [-i MAZE_ID]
   maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-i MAZE_ID]
   maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME] [-i MAZE_ID]
-  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME] [-i MAZE_ID]
-  maze svg [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME] [-i MAZE_ID]
+  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY]  [-L] [-f FILENAME] [-i MAZE_ID]
+  maze svg [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-f FILENAME] [-i MAZE_ID]
   maze data [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-i MAZE_ID]
 
 Options:
@@ -278,7 +278,7 @@ def maze(args):
 
     grid = create_maze(width, height, density, add_a_loop)
 
-    solution = find_solution(grid)
+    # solution = find_solution(grid)
 
     return_data = {'maze_id': f"{maze_id}"}
 
