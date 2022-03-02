@@ -55,19 +55,18 @@ from docopt import docopt
 # constants to aid with describing the passage directions
 N, S, E, W, U = 0x1, 0x2, 0x4, 0x8, 0x10
 DX = {E: 1, W: -1, N: 0, S: 0}
-DY = {E: 0, W:  0, N: -1, S: 1}
+DY = {E: 0, W: 0, N: -1, S: 1}
 OPPOSITE = {E: W, W: E, N: S, S: N}
+
 
 #
 
 
 class Tree(object):
-
     _children_for_parent = {}
     _parent_for_child = {}
 
     def __init__(self):
-
         Tree._children_for_parent[self] = set()
         Tree._parent_for_child[self] = self
 
@@ -76,7 +75,6 @@ class Tree(object):
                 Tree._parent_for_child[tree])
 
     def connect(self, tree):
-
         # find root objs
         new_parent = Tree._parent_for_child[self]
         tree_patent = Tree._parent_for_child[tree]
@@ -95,10 +93,9 @@ class Tree(object):
 
 
 def create_maze(width, height, density, add_a_loop):
-
     # structures to hold the maze
     grid = [[0 for x in range(width)] for x in range(height)]
-    sets = [[Tree() for x in range(width)] for x in range(height)]
+    sets = [[Tree() for x in range(width)] for y in range(height)]
 
     # build the list of edges
     edges = []
@@ -126,7 +123,7 @@ def create_maze(width, height, density, add_a_loop):
             sx, sy = cx, cy + 1
 
             if (grid[cy][cx] != 0 or
-                sets[ny][nx].connected(sets[sy][sx]) or
+                    sets[ny][nx].connected(sets[sy][sx]) or
                     sets[ey][ex].connected(sets[wy][wx])):
                 continue
 
@@ -144,9 +141,9 @@ def create_maze(width, height, density, add_a_loop):
             grid[sy][sx] |= N
 
             edges[:] = [(x, y, d) for (x, y, d) in edges if not (
-                (x == cx and y == cy) or
-                (x == ex and y == ey and d == W) or
-                (x == sx and y == sy and d == N)
+                    (x == cx and y == cy) or
+                    (x == ex and y == ey and d == W) or
+                    (x == sx and y == sy and d == N)
             )]
 
     # Kruskal's algorithm
@@ -181,8 +178,64 @@ def create_maze(width, height, density, add_a_loop):
     return grid
 
 
-def maze(args):
+def get_moves(grid, coordinate, cell):
+    # for a given position, return all the posible coordinate moves
+    moves = []
 
+    y = coordinate[1]
+    x = coordinate[0]
+    if cell & W == W:
+        inc = -1
+        # if the next cell is an under or over cell, jump over it
+        while grid[y][x+inc] in (19, 28): # could be more than one in a row
+            inc -= 1
+        moves.append((inc, 0))
+    if cell & E == E:
+        inc = 1
+        while grid[y][x+inc] in (19, 28):
+            inc += 1
+        moves.append((inc, 0))
+    if cell & N == N:
+        inc = -1
+        while grid[y+inc][x] in (19, 28):
+            inc -= 1
+        moves.append((0, inc))
+    if cell & S == S:
+        inc = 1
+        while grid[y+inc][x] in (19, 28):
+            inc += 1
+        moves.append((0, inc))
+    return moves
+
+
+def search(grid, coordinate, sofar, depth):
+    cell = grid[coordinate[1]][coordinate[0]]
+
+    for move in get_moves(grid, coordinate, cell):
+        new_coordinate = (coordinate[0] + move[0], coordinate[1] + move[1])
+
+        # if are back to where we where, then are in a loop
+        if new_coordinate in sofar:
+             continue
+
+        new_so_far = [s for s in sofar]
+        new_so_far.append(new_coordinate)
+
+        # are we at the end already?
+        if new_coordinate[0] == len(grid[0])-1 and new_coordinate[1] == len(grid)-1:
+            return new_so_far
+
+        solution = search(grid, new_coordinate, new_so_far, depth + 1)
+        if solution:
+           return solution
+
+
+def find_solution(grid):
+    sofar = search(grid, (0, 0),  [(0, 0)], 0)
+    print('Solution ->', sofar)
+
+
+def maze(args):
     width = int(args['--width'])
     height = int(args['--height'])
     density = int(args['--density'])
@@ -224,6 +277,8 @@ def maze(args):
                       'height': height}
 
     grid = create_maze(width, height, density, add_a_loop)
+
+    solution = find_solution(grid)
 
     return_data = {'maze_id': f"{maze_id}"}
 

@@ -89,7 +89,7 @@ class SVG(object):
             for i, cell in enumerate(row):
                 x = left_margin + i * s
 
-                if (i == 0 and j == len(grid) - 1) or (i == len(row)-1 and j == 0):
+                if (i == 0 and j == len(grid) - 1) or (i == len(row) - 1 and j == 0):
                     self.dot(x, y)
                 else:
                     self.TILES[cell](x, y)
