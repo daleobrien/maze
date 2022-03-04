@@ -25,9 +25,9 @@ python3 maze.py svg maze.svg -s maze-solved.svg -W 23 -H 30
 ```
 will produce:
 
-| maze.svg          | maze-solved.svg            | 
-|-------------------|----------------------------|
-| ![Maze](maze.svg) | ![Solved](maze-solved.svg) |
+| maze.svg          | maze-solved.svg                                                     | 
+|-------------------|---------------------------------------------------------------------|
+| ![](https://github.com/daleobrien/maze/blob/master/maze.svg?raw=True) | ![](https://github.com/daleobrien/maze/blob/master/maze-solved.svg?raw=True) |
 
 Using the `-S` option will produce a maze with no curves e.g.:
 ```bash
@@ -36,7 +36,7 @@ maze svg maze-straight.svg -s maze-straight-solved.svg -W 23 -H 30
 
 | maze.svg                   | maze-solved.svg                     |
 |----------------------------|-------------------------------------|
-| ![Maze](maze-straight.svg) | ![Solved](maze-straight-solved.svg) |
+| ![](https://github.com/daleobrien/maze/blob/master/maze-straight.svg?raw=True) | ![](https://github.com/daleobrien/maze/blob/master/maze-straight-solved.svg?raw=True) |
 
 
 To generate PDF (currenlty this options doesn't allow solutions to be generated)
