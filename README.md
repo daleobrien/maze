@@ -10,6 +10,10 @@ Installation
 ```bash
 pip3 install maze
 ```
+Or install from source:
+```bash
+python3 setup.py install
+```
 
 To export a 20 by 30 maze SVG and a solution SVG, run:
 ```bash
