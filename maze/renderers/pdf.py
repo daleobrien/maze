@@ -2,6 +2,7 @@
 
 from math import sqrt, asin, pi, ceil
 from reportlab.pdfgen.canvas import Canvas
+
 try:
     from io import BytesIO as StringIO
 except ImportError:
@@ -11,8 +12,7 @@ except ImportError:
         from StringIO import StringIO
 
 
-def render(grid, options):
-
+def pdf_render(grid, options):
     draw_with_curves = options['draw_with_curves']
     filename = options['filename']
     use_A4 = options['use_A4']
@@ -53,10 +53,10 @@ def render(grid, options):
         p.lineTo(b, s)
 
     buffer = StringIO()
-    if filename:
-        c = Canvas(filename)
-    else:
-        c = Canvas(buffer)
+    # if filename:
+    #     c = Canvas(filename)
+    # else:
+    c = Canvas(buffer)
 
     c.setTitle('Maze')
     c.setSubject("")
@@ -101,15 +101,13 @@ def render(grid, options):
 
     k = 0.5
 
-    n = -(g / k) + 0.5 * (s - sqrt((g *
-                                    (4.0 * g - 3.0 * g * k + 2 * k * s)) / k))
+    n = -(g / k) + 0.5 * (s - sqrt((g * (4.0 * g - 3.0 * g * k + 2 * k * s)) / k))
 
     r = g / k
     q = n + r
     v = (g * (-1 + k)) / k
 
-    theta = asin((2.0 * g - 2.0 * g * k + k * s) /
-                 (2.0 * g - g * k + k * s)) * 180 / pi
+    theta = asin((2.0 * g - 2.0 * g * k + k * s) / (2.0 * g - g * k + k * s)) * 180 / pi
 
     delta = theta - 90
 
@@ -132,7 +130,6 @@ def render(grid, options):
             end = (i == org_width - 1 and j == 0)
 
             if start or end:
-
                 c.setStrokeColorRGB(0.9, 0.1, 0.1)
                 c.setFillColorRGB(0.9, 0.1, 0.1)
                 p.circle(s / 2.0, s / 2.0, g / 1.5)
@@ -141,7 +138,6 @@ def render(grid, options):
                 p = c.beginPath()
 
             if cell == 3:
-
                 '│ │'
                 '│ │'
 
@@ -163,15 +159,10 @@ def render(grid, options):
                     y = n
                     p.arcTo(x, y, x + 2 * r, y + 2 * r, 180, delta)
 
-                    p.arcTo(g / 2,
-                            g / 2,
-                            s - g / 2,
-                            s - g / 2, theta - 90, 360 - 2 * theta)
+                    p.arcTo(g / 2, g / 2, s - g / 2, s - g / 2, theta - 90, 360 - 2 * theta)
 
                     x = v - r
-                    p.arcTo(x, y,
-                            x + 2 * r,
-                            y + 2 * r, 90 - theta, delta)
+                    p.arcTo(x, y, x + 2 * r, y + 2 * r, 90 - theta, delta)
 
                 else:
                     p.lineTo(b, b)
@@ -190,15 +181,10 @@ def render(grid, options):
                     y = s - n - 2 * r
                     p.arcTo(x, y, x + 2 * r, y + 2 * r, 180, -delta)
 
-                    p.arcTo(g / 2,
-                            g / 2,
-                            s - g / 2,
-                            s - g / 2, 90 - theta, -360 + 2 * theta)
+                    p.arcTo(g / 2, g / 2, s - g / 2, s - g / 2, 90 - theta, -360 + 2 * theta)
 
                     x = v - r
-                    p.arcTo(x, y,
-                            x + 2 * r,
-                            y + 2 * r, 270 + theta, -delta)
+                    p.arcTo(x, y, x + 2 * r, y + 2 * r, 270 + theta, -delta)
 
                 else:
                     p.lineTo(b, a)
@@ -216,15 +202,10 @@ def render(grid, options):
                     y = s - v - r
                     p.arcTo(x, y, x + 2 * r, y + 2 * r, 270, delta)
 
-                    p.arcTo(g / 2,
-                            g / 2,
-                            s - g / 2,
-                            s - g / 2, 90 + delta, 360 - 2 * theta)
+                    p.arcTo(g / 2, g / 2, s - g / 2, s - g / 2, 90 + delta, 360 - 2 * theta)
 
                     y = v - r
-                    p.arcTo(x, y,
-                            x + 2 * r,
-                            y + 2 * r, 180 - theta, delta)
+                    p.arcTo(x, y, x + 2 * r, y + 2 * r, 180 - theta, delta)
 
                 else:
                     p.lineTo(g, b)
@@ -243,15 +224,10 @@ def render(grid, options):
 
                     p.arcTo(x, y, x + 2 * r, y + 2 * r, 270, -delta)
 
-                    p.arcTo(g / 2,
-                            g / 2,
-                            s - g / 2,
-                            s - g / 2, 90 - delta, -360 + 2 * theta)
+                    p.arcTo(g / 2, g / 2, s - g / 2, s - g / 2, 90 - delta, -360 + 2 * theta)
 
                     y = v - r
-                    p.arcTo(x, y,
-                            x + 2 * r,
-                            y + 2 * r, theta, -delta)
+                    p.arcTo(x, y, x + 2 * r, y + 2 * r, theta, -delta)
                 else:
                     p.lineTo(b, b)
                     p.lineTo(b, a)
@@ -289,7 +265,6 @@ def render(grid, options):
                 p.lineTo(a, s)
 
             if cell == 7:
-
                 '│ └'
                 '│ ┌'
 
@@ -331,7 +306,6 @@ def render(grid, options):
                 p.lineTo(b, s)
 
             if cell == 11:
-
                 '┘ │'
                 '┐ │'
 
@@ -342,7 +316,6 @@ def render(grid, options):
                 s_shape_01(p)
 
             if cell == 12:
-
                 '───'
                 '───'
 
@@ -352,7 +325,6 @@ def render(grid, options):
                 p.lineTo(s, a)
 
             if cell == 13:
-
                 '┘ └'
                 '───'
 
@@ -363,7 +335,6 @@ def render(grid, options):
                 s_shape_10(p)
 
             if cell == 14:
-
                 '───'
                 '┐ ┌'
 
@@ -374,7 +345,6 @@ def render(grid, options):
                 s_shape_11(p)
 
             if cell == 15:
-
                 '┘ └'
                 '┐ ┌'
 
@@ -384,7 +354,6 @@ def render(grid, options):
                 s_shape_11(p)
 
             if cell == 19:
-
                 '┤ ├'
                 '┤ ├'
 
@@ -404,7 +373,6 @@ def render(grid, options):
                 p.lineTo(b, b)
 
             if cell == 28:
-
                 '┴─┴'
                 '┬─┬'
 
@@ -427,9 +395,7 @@ def render(grid, options):
             c.translate(-x_offset, -y_offset)
 
     c.save()
-    pdf = ""
-    if not filename:
-        pdf = buffer.getvalue()
-        buffer.close()
+    pdf = buffer.getvalue()
+    buffer.close()
 
     return pdf

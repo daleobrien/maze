@@ -18,27 +18,24 @@ Usage:
   maze -h
   maze pdf FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-O ORIENTATION] [-i MAZE_ID]
   maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-i MAZE_ID]
-  maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME] [-i MAZE_ID]
-  maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY]  [-L] [-f FILENAME] [-i MAZE_ID]
-  maze svg [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-f FILENAME] [-i MAZE_ID] [-s SOLUTION_FILENAME]
-  maze data [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-i MAZE_ID]
+  maze svg FILENAME [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-i MAZE_ID] [-s SOLUTION_FILENAME]
 
 Options:
-  -h, --help                    Show this help message and exit
+  -h, --help                        Show this help message and exit
 
-  -W --width WIDTH              Number of cells wide [default: 21]
-  -H --height HEIGHT            Number of cells high [default: 30]
+  -W --width WIDTH                  Number of cells wide [default: 21]
+  -H --height HEIGHT                Number of cells high [default: 30]
 
-  -d --density DENSITY          Density of under/overs [default: 50]
+  -d --density DENSITY              Density of under/overs [default: 50]
 
-  -L                            Enable a loop
+  -L                                Enable a loop
 
-  -S                            Draw with straight lines instead of curves
+  -S                                Draw with straight lines instead of curves
 
-  -p PAGE_SIZE                  Page size, (A4 or Letter) [default: A4]
-  -O --orientation ORIENTATION  Orientation, P=portrait, L=landscape [default: P]
+  -p PAGE_SIZE                      Page size, (A4 or Letter) [default: A4]
+  -O --orientation ORIENTATION      Orientation, P=portrait, L=landscape [default: P]
 
-  -i --maze_id MAZE_ID          Text used to identify which maze otherwise a random maze will be generated
+  -i --maze_id MAZE_ID              Identify which maze, otherwise a random maze will be generated
   
   -s --solution SOLUTION_FILENAME   Save the solution to the maze to a file
 
@@ -53,6 +50,15 @@ import uuid
 from random import randint, seed, shuffle
 
 from docopt import docopt
+
+try:
+    from renderers.pdf import pdf_render
+    from renderers.text import text_render
+    from renderers.svg import svg_render
+except ImportError:
+    from maze.renderers.pdf import pdf_render  # NOQA
+    from maze.renderers.text import text_render  # NOQA
+    from maze.renderers.svg import svg_render  # NOQA
 
 # constants to aid with describing the passage directions
 N, S, E, W, U = 0x1, 0x2, 0x4, 0x8, 0x10
@@ -70,8 +76,7 @@ class Tree(object):
         Tree._parent_for_child[self] = self
 
     def connected(self, tree):
-        return (Tree._parent_for_child[self] ==
-                Tree._parent_for_child[tree])
+        return (Tree._parent_for_child[self] == Tree._parent_for_child[tree])
 
     def connect(self, tree):
         # find root objs
@@ -121,9 +126,7 @@ def create_maze(width, height, density, add_a_loop):
             ex, ey = cx + 1, cy
             sx, sy = cx, cy + 1
 
-            if (grid[cy][cx] != 0 or
-                    sets[ny][nx].connected(sets[sy][sx]) or
-                    sets[ey][ex].connected(sets[wy][wx])):
+            if (grid[cy][cx] != 0 or sets[ny][nx].connected(sets[sy][sx]) or sets[ey][ex].connected(sets[wy][wx])):
                 continue
 
             sets[ny][nx].connect(sets[sy][sx])
@@ -140,10 +143,7 @@ def create_maze(width, height, density, add_a_loop):
             grid[sy][sx] |= N
 
             edges[:] = [(x, y, d) for (x, y, d) in edges if not (
-                (x == cx and y == cy) or
-                (x == ex and y == ey and d == W) or
-                (x == sx and y == sy and d == N)
-            )]
+                    (x == cx and y == cy) or (x == ex and y == ey and d == W) or (x == sx and y == sy and d == N))]
 
     # Kruskal's algorithm
     while edges:
@@ -186,22 +186,22 @@ def get_moves(grid, coordinate, cell):
     if cell & W == W:
         inc = -1
         # if the next cell is an under or over cell, jump over it
-        while grid[y][x+inc] in (19, 28):  # could be more than one in a row
+        while grid[y][x + inc] in (19, 28):  # could be more than one in a row
             inc -= 1
         moves.append((inc, 0))
     if cell & E == E:
         inc = 1
-        while grid[y][x+inc] in (19, 28):
+        while grid[y][x + inc] in (19, 28):
             inc += 1
         moves.append((inc, 0))
     if cell & N == N:
         inc = -1
-        while grid[y+inc][x] in (19, 28):
+        while grid[y + inc][x] in (19, 28):
             inc -= 1
         moves.append((0, inc))
     if cell & S == S:
         inc = 1
-        while grid[y+inc][x] in (19, 28):
+        while grid[y + inc][x] in (19, 28):
             inc += 1
         moves.append((0, inc))
     return moves
@@ -221,16 +221,16 @@ def search(grid, coordinate, sofar, depth):
         new_so_far.append(new_coordinate)
 
         # are we at the end already?
-        if new_coordinate[0] == len(grid[0])-1 and new_coordinate[1] == len(grid)-1:
+        if new_coordinate[0] == len(grid[0]) - 1 and new_coordinate[1] == len(grid) - 1:
             return new_so_far
 
         solution = search(grid, new_coordinate, new_so_far, depth + 1)
         if solution:
-           return solution
+            return solution
 
 
 def find_solution(grid):
-    return search(grid, (0, 0),  [(0, 0)], 0)
+    return search(grid, (0, 0), [(0, 0)], 0)
 
 
 def maze(args):
@@ -238,7 +238,7 @@ def maze(args):
     height = int(args['--height'])
     density = int(args['--density'])
 
-    # allow the same maze to be generated
+    # allow the same maze to be generated if a maze_id is given.
     maze_id = args.get('--maze_id', None)
     if maze_id is None:
         maze_id = uuid.uuid4()
@@ -256,16 +256,6 @@ def maze(args):
 
     use_A4 = True if args['-p'] == 'A4' else False
 
-    dislay_to_screen = args['text']
-    generate_canvas_js = args['canvas']
-    generate_js = args['javascript']
-    generate_svg = args['svg']
-    generate_data = args['data']
-    generate_pdf = args['pdf']
-
-    if generate_data:
-        filename = "maze.pdf"
-
     grid = create_maze(width, height, density, add_a_loop)
 
     solution = None
@@ -273,70 +263,29 @@ def maze(args):
     if solution_filename:
         solution = find_solution(grid)
 
-    return_data = {'maze_id': f"{maze_id}"}
-
     # render options
-    render_options = {'filename': filename,
-                      'draw_with_curves': not args['-S'],
-                      'use_A4': use_A4,
-                      'landscape': args['--orientation'] == 'L',
-                      'width': width,
-                      'height': height,
-                      'solution': solution}
+    options = {'filename': filename, 'draw_with_curves': not args['-S'], 'use_A4': use_A4,
+               'landscape': args['--orientation'] == 'L', 'width': width, 'height': height, 'solution': solution}
 
-    # to pdf, if we have a filename
-    if filename and generate_data or generate_pdf:
-
-        try:
-            from renderers.pdf import render
-        except ImportError:
-            from maze.renderers.pdf import render  # NOQA
-
-        return_data['pdf'] = render(grid, render_options)
+    if args['pdf']:
+        pdf = pdf_render(grid, options)
+        with open(filename, 'wb') as f:
+            f.write(pdf)
 
     # to screen
-    if dislay_to_screen:
-        try:
-            from renderers.text import render
-        except ImportError:
-            from maze.renderers.text import render  # NOQA
+    if args['text']:
+        text_render(grid, options)
 
-        render(grid, render_options)
-
-    if generate_canvas_js:
-        try:
-            from renderers.canvas import render
-        except ImportError:
-            from maze.renderers.canvas import render  # NOQA
-
-        return_data['canvas'] = render(grid, render_options)
-        if filename and not generate_data:
-            with open(filename, 'w') as f:
-                f.write(return_data['canvas'])
-
-    if generate_js or generate_data:
-        try:
-            from renderers.js import render
-        except ImportError:
-            from maze.renderers.js import render  # NOQA
-
-        return_data['js'] = render(grid, render_options)
-        if filename and not generate_data:
-            with open(filename, 'w') as f:
-                f.write(return_data['js'])
-
-    if generate_svg or generate_data:
-        try:
-            from renderers.svg import render
-        except ImportError:
-            from maze.renderers.svg import render  # NOQA
-
-        return_data['svg'] = render(grid, render_options)
-        if filename and not generate_data:
-            with open(filename, 'w') as f:
-                f.write(return_data['svg'])
-
-    return return_data
+    if args['svg']:
+        options['solution'] = []
+        svg_with_solution = svg_render(grid, options)
+        if solution_filename:
+            options['solution'] = solution
+            svg = svg_render(grid, options)
+            with open(solution_filename, 'w') as f:
+                f.write(svg)
+        with open(filename, 'w') as f:
+            f.write(svg_with_solution)
 
 
 if __name__ == "__main__":
@@ -345,7 +294,4 @@ if __name__ == "__main__":
         print(__doc__)
         exit()
 
-    # seed(0)
     maze(docopt(__doc__))
-
-#

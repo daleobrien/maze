@@ -1,6 +1,5 @@
-from inspect import trace
+import itertools
 from math import sqrt, asin, pi, ceil, sin, cos
-from pickle import TRUE
 
 QUARTER = pi / 2
 HALF = pi
@@ -8,15 +7,31 @@ THREE_QUARTER = 3 * pi / 2
 FULL = 2 * pi
 
 
+def pairwise(iterable):
+    "s -> (s0, s1), (s1, s2), (s2, s3), ..."
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+
+def threes(iterator):
+    "s -> (s0, s1, s2), (s1, s2, s3), (s2, s3, 4), ..."
+    a, b, c = itertools.tee(iterator, 3)
+    next(b, None)
+    next(c, None)
+    next(c, None)
+    return zip(a, b, c)
+
+
 class SVGPath(object):
 
-    def __init__(self, colour, stroke_width, opacity, s, draw_with_curves=True):
-        print("draw_with_curves", draw_with_curves)
+    def __init__(self, colour, stroke_width, opacity, s, draw_with_curves=None, faint=None):
         self.svg = ''
         self.dots = ''
         self.colour = colour
         self.stroke_width = stroke_width
         self.opacity = opacity
+        self.faint = faint
 
         self.S = s
         self.S2 = s / 2.0
@@ -24,15 +39,13 @@ class SVGPath(object):
         self.B = s - g
         k = 0.5
 
-        n = -(g / k) + 0.5 * (s - sqrt((g *
-                                        (4.0 * g - 3.0 * g * k + 2 * k * s)) / k))
+        n = -(g / k) + 0.5 * (s - sqrt((g * (4.0 * g - 3.0 * g * k + 2 * k * s)) / k))
 
         r = g / k
         q = n + r
         v = (g * (-1 + k)) / k
 
-        theta = asin((2.0 * g - 2.0 * g * k + k * s) /
-                     (2.0 * g - g * k + k * s))
+        theta = asin((2.0 * g - 2.0 * g * k + k * s) / (2.0 * g - g * k + k * s))
 
         delta = theta - pi / 2.0
 
@@ -59,7 +72,7 @@ class SVGPath(object):
         self.draw_with_curves = draw_with_curves
 
     def path(self):
-        return f"""<path opacity="{self.opacity}" stroke-width="{self.stroke_width}" stroke="{self.colour}" d="{self.svg}"></path> {self.dots}"""
+        return f"""<path stroke-opacity="{self.opacity}" stroke-width="{self.stroke_width}" stroke="{self.colour}" d="{self.svg}" /> {self.dots}"""
 
     def dot(self, x, y):
         a = self.round(x + self.S2)
@@ -123,25 +136,52 @@ class SVGPath(object):
 
 class SVGPathTrace(SVGPath):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def direction(self, dx, dy):
+        if (dx == 0):
+            return 'b' if dy < 0 else 't'
+        return 'r' if dx < 0 else 'l'
 
-        self.TRAIL_CELLS = {
-            't': {'l': self.t9, 'r': self.t5, 'b': self.t3},
-            'l': {'t': self.t9, 'r': self.tc, 'b': self.ta},
-            'r': {'l': self.tc, 't': self.t5, 'b': self.t6},
-            'b': {'l': self.ta, 'r': self.t6, 't': self.t3}
-        }
-        self.TRAIL_LAST = {
-            'r': self.t4,
-            'l': self.t8,
-            'b': self.t2,
-            't': self.t1}
+    def render(self, grid, trail):
 
-    def render(self, solution):
+        TILES = {'t': {'l': self.t9, 'r': self.t5, 'b': self.t3}, 'l': {'t': self.t9, 'r': self.tc, 'b': self.ta},
+                 'r': {'l': self.tc, 't': self.t5, 'b': self.t6}, 'b': {'l': self.ta, 'r': self.t6, 't': self.t3}}
 
-        # self.TILES(cell)(x, y)
-        pass
+        for i, [prev, curr, head] in enumerate(threes(trail)):
+
+            from_d = self.direction(curr[0] - prev[0], curr[1] - prev[1])
+            to_d = self.direction(curr[0] - head[0], curr[1] - head[1])
+            coordinates = (curr[0] * self.S, curr[1] * self.S)
+
+            if i == 0:
+                if from_d == 't':
+                    self.t2(prev[0] * self.S, prev[1] * self.S)
+                elif from_d == 'l':
+                    self.t4(prev[0] * self.S, prev[1] * self.S)
+            if i == len(trail) - 3:
+                if to_d == 'r':
+                    self.t8(head[0] * self.S, head[1] * self.S)
+                if to_d == 'b':
+                    self.t1(head[0] * self.S, head[1] * self.S)
+
+            if not self.faint:
+                TILES[from_d][to_d](*coordinates)
+
+            dx = (prev[0] - curr[0]) // 2
+            dy = (prev[1] - curr[1]) // 2
+            coordinates = ((dx + curr[0]) * self.S, (dy + curr[1]) * self.S)
+            prev_tile = grid[dy + curr[1]][dx + curr[0]]
+
+            if dx == 1 or dx == -1:
+                if prev_tile == 19:
+                    self.tg(*coordinates)
+                elif prev_tile == 28 and not self.faint:
+                    self.tc(*coordinates)
+
+            if dy == 1 or dy == -1:
+                if prev_tile == 19 and not self.faint:
+                    self.t3(*coordinates)
+                elif prev_tile == 28:
+                    self.th(*coordinates)
 
     def t1(self, x, y):
         # │
@@ -155,35 +195,47 @@ class SVGPathTrace(SVGPath):
 
     def t4(self, x, y):
         # .-
-        self.mh(x + self.S, y + self.S2, -self.S2)
+        self.mh(x + self.S2, y + self.S2, self.S2)
 
     def t8(self, x, y):
         # -.
-        self.mh(x, y + self, self)
+        self.mh(x + self.S2, y + self.S2, -self.S2)
 
     def t5(self, x, y):
         # Medium arc
         # └─
         self.m(x + self.S, y + self.S2)
-        self.a(x + self.B2, y + self.A2, self.R3, QUARTER, HALF)
+        if self.draw_with_curves:
+            self.a(x + self.B2, y + self.A2, self.R3, QUARTER, HALF)
+        else:
+            self.l(x + self.S2, y + self.S2)
         self.l(x + self.S2, y)
 
     def t6(self, x, y):
         # ┌─
         self.m(x + self.S, y + self.S2)
-        self.a(x + self.B2, y + self.B2, self.R3, THREE_QUARTER, HALF, 0)
+        if self.draw_with_curves:
+            self.a(x + self.B2, y + self.B2, self.R3, THREE_QUARTER, HALF, 0)
+        else:
+            self.l(x + self.S2, y + self.S2)
         self.l(x + self.S2, y + self.S)
 
     def t9(self, x, y):
         # ─┘
         self.m(x + self.S2, y)
-        self.a(x + self.A2, y + self.A2, self.R3, 0, QUARTER)
+        if self.draw_with_curves:
+            self.a(x + self.A2, y + self.A2, self.R3, 0, QUARTER)
+        else:
+            self.l(x + self.S2, y + self.S2)
         self.l(x, y + self.S2)
 
     def ta(self, x, y):
         # ─┐
         self.m(x, y + self.S2)
-        self.a(x + self.A2, y + self.B2, self.R3, THREE_QUARTER, HALF)
+        if self.draw_with_curves:
+            self.a(x + self.A2, y + self.B2, self.R3, THREE_QUARTER, FULL)
+        else:
+            self.l(x + self.S2, y + self.S2)
         self.l(x + self.S2, y + self.S)
 
     def t3(self, x, y):
@@ -196,32 +248,34 @@ class SVGPathTrace(SVGPath):
         self.h(x, y, self.S2)
 
     def tg(self, x, y):
-        # Outside to A/B
-        self.mh(x, y + self.S2, self.A)
-        self.mh(x + self.S, y + self.S2, -self.A)
-        # Inside to A/B (faint)
-        self.mh(x + self.A, y + self.S2, self.R4)
-        self.mh(x + self.B, y + self.S2, -self.R4)
+
+        if self.faint:
+            # Inside to A/B (faint)
+            self.mh(x + self.A, y + self.S2, self.R4)
+            self.mh(x + self.B, y + self.S2, -self.R4)
+        else:
+            # Outside to A/B
+            self.mh(x, y + self.S2, self.A)
+            self.mh(x + self.S, y + self.S2, -self.A)
 
     def th(self, x, y):
-        # Outside to A/B
-        self.mv(x + self.S2, y, self.A)
-        self.mv(x + self.S2, y + self.S, -self.A)
-        # Inside to A/B (faint)
-        self.mv(x + self.S2, y + self.A, self.R4)
-        self.mv(x + self.S2, y + self.B, -self.R4)
+
+        if self.faint:
+            # Inside to A/B (faint)
+            self.mv(x + self.S2, y + self.A, self.R4)
+            self.mv(x + self.S2, y + self.B, -self.R4)
+        else:
+            # Outside to A/B
+            self.mv(x + self.S2, y, self.A)
+            self.mv(x + self.S2, y + self.S, -self.A)
 
 
 class SVGPathMazeWalls(SVGPath):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.TILES = {1: self.c1, 2: self.c2, 3: self.c3, 4: self.c4, 5: self.c5, 6: self.c6,
-                      7: self.c7, 8: self.c8, 9: self.c9, 10: self.ca, 11: self.cb, 12: self.cc,
-                      13: self.cd, 14: self.ce, 15: self.cf, 19: self.cg, 28: self.ch}
-
     def render(self, grid):
+        TILES = {1: self.c1, 2: self.c2, 3: self.c3, 4: self.c4, 5: self.c5, 6: self.c6, 7: self.c7, 8: self.c8,
+                 9: self.c9, 10: self.ca, 11: self.cb, 12: self.cc, 13: self.cd, 14: self.ce, 15: self.cf, 19: self.cg,
+                 28: self.ch}
         left_margin = 0
         top_margin = 0
 
@@ -231,10 +285,10 @@ class SVGPathMazeWalls(SVGPath):
             for i, cell in enumerate(row):
                 x = left_margin + i * self.S
 
-                if (i == 0 and j == len(grid) - 1) or (i == len(row) - 1 and j == 0):
+                if (i == 0 and j == 0 or (i == len(row) - 1 and j == len(grid) - 1)):
                     self.dot(x, y)
                 else:
-                    self.TILES[cell](x, y)
+                    TILES[cell](x, y)
 
     def s0(self, x, y, radius=None):
         # ┘
@@ -285,12 +339,10 @@ class SVGPathMazeWalls(SVGPath):
         # └─┘
         self.mv(x + self.B, y, self.Q)
         if self.draw_with_curves:
-            self.a(x + self.S - self.V, y + self.N + self.R,
-                   self.R, HALF, HALF + self.delta, 0)
-            self.a(x + self.S2, y + self.S2, self.S2 - self.G / 2,
-                   self.theta - QUARTER, THREE_QUARTER - self.theta)
-            self.a(x + self.V, y + self.N + self.R, self.R, QUARTER -
-                   self.theta, THREE_QUARTER + self.theta - self.delta, 0)
+            self.a(x + self.S - self.V, y + self.N + self.R, self.R, HALF, HALF + self.delta, 0)
+            self.a(x + self.S2, y + self.S2, self.S2 - self.G / 2, self.theta - QUARTER, THREE_QUARTER - self.theta)
+            self.a(x + self.V, y + self.N + self.R, self.R, QUARTER - self.theta,
+                   THREE_QUARTER + self.theta - self.delta, 0)
         else:
             self.l(x + self.B, y + self.B)
             self.l(x + self.A, y + self.B)
@@ -301,12 +353,11 @@ class SVGPathMazeWalls(SVGPath):
         # │ │
         self.m(x + self.B, y + self.S)
         if self.draw_with_curves:
-            self.a(x + self.S - self.V, y + self.S - self.N -
-                   self.R, self.R, HALF, HALF - self.delta)
-            self.a(x + self.S2, y + self.S2, self.S2 - self.G / 2.0,
-                   QUARTER - self.theta, self.theta - THREE_QUARTER, 0)
-            self.a(x + self.V, y + self.S - self.N - self.R, self.R,
-                   THREE_QUARTER + self.theta, THREE_QUARTER + self.theta - self.delta)
+            self.a(x + self.S - self.V, y + self.S - self.N - self.R, self.R, HALF, HALF - self.delta)
+            self.a(x + self.S2, y + self.S2, self.S2 - self.G / 2.0, QUARTER - self.theta, self.theta - THREE_QUARTER,
+                   0)
+            self.a(x + self.V, y + self.S - self.N - self.R, self.R, THREE_QUARTER + self.theta,
+                   THREE_QUARTER + self.theta - self.delta)
         else:
             self.l(x + self.B, y + self.A)
             self.l(x + self.A, y + self.A)
@@ -317,12 +368,12 @@ class SVGPathMazeWalls(SVGPath):
         # └──
         self.m(x + self.S, y + self.B)
         if self.draw_with_curves:
-            self.a(x + self.S - self.N - self.R, y + self.S - self.V,
-                   self.R, THREE_QUARTER, THREE_QUARTER + self.delta, 0)
-            self.a(x + self.S2, y + self.S2, self.S2 - self.G / 2.0,
-                   QUARTER + self.delta, QUARTER + self.delta - 2 * self.theta)
-            self.a(x + self.S - self.N - self.R, y + self.V, self.R,
-                   HALF - self.theta, HALF - self.theta + self.delta, 0)
+            self.a(x + self.S - self.N - self.R, y + self.S - self.V, self.R, THREE_QUARTER, THREE_QUARTER + self.delta,
+                   0)
+            self.a(x + self.S2, y + self.S2, self.S2 - self.G / 2.0, QUARTER + self.delta,
+                   QUARTER + self.delta - 2 * self.theta)
+            self.a(x + self.S - self.N - self.R, y + self.V, self.R, HALF - self.theta, HALF - self.theta + self.delta,
+                   0)
         else:
             self.l(x + self.G, y + self.B)
             self.l(x + self.A, y + self.A)
@@ -334,12 +385,10 @@ class SVGPathMazeWalls(SVGPath):
         # ──┘
         self.m(x, y + self.B)
         if self.draw_with_curves:
-            self.a(x + self.N + self.R, y + self.S - self.V, self.R,
-                   THREE_QUARTER, THREE_QUARTER - self.delta)
-            self.a(x + self.S2, y + self.S2, self.S2 - self.G / 2.0,
-                   QUARTER - self.delta, QUARTER - self.delta + 2.0 * self.theta, 0)
-            self.a(x + self.N + self.R, y + self.V, self.R,
-                   self.theta, self.theta - self.delta)
+            self.a(x + self.N + self.R, y + self.S - self.V, self.R, THREE_QUARTER, THREE_QUARTER - self.delta)
+            self.a(x + self.S2, y + self.S2, self.S2 - self.G / 2.0, QUARTER - self.delta,
+                   QUARTER - self.delta + 2.0 * self.theta, 0)
+            self.a(x + self.N + self.R, y + self.V, self.R, self.theta, self.theta - self.delta)
         else:
             self.l(x + self.B, y + self.B)
             self.l(x + self.B, y + self.A)
@@ -476,18 +525,13 @@ class SVG(object):
         height = options['height']
         use_A4 = options['use_A4']
         draw_with_curves = options['draw_with_curves']
-        self.solution = options['solution']
+        solution = options['solution']
         left_margin = 0
-        print(options)
-        print(self.solution)
 
         dpi = 72
         if use_A4:
             page_width = 8.3 * dpi
             page_height = 11.7 * dpi
-            # landscape
-            page_height = 8.3 * dpi
-            page_width = 11.7 * dpi
         else:
             # US Letter
             page_width = 8.5 * dpi
@@ -501,65 +545,34 @@ class SVG(object):
         s = (page_width - 2 * left_margin) / width
         self.stroke_width = 2
 
-        self.p = SVGPathMazeWalls(
-            '#000000', self.stroke_width, '1.0', s, draw_with_curves)  # Maze walls
-        self.t = SVGPathTrace('#E51919', 5, '1.0', s,
-                              draw_with_curves)  # solution
-        self.f = SVGPathTrace('#E51919', 5, '0.1', s,
-                              draw_with_curves)  # faint solution lines
+        self.walls = SVGPathMazeWalls('#000000', self.stroke_width, '1.0', s, draw_with_curves=draw_with_curves,
+                                      faint=False)  # Maze walls
+        self.over_trace = SVGPathTrace('#E51919', 5, '1.0', s, draw_with_curves)  # solution
+        self.under_trace = SVGPathTrace('#E51919', 5, '0.2', s, draw_with_curves=draw_with_curves,
+                                        faint=True)  # faint solution lines
 
         self.width = width
         self.height = height
+        self.S = s
 
-        self.p.render(grid)
-
-    def create_solution(self):
-
-        for idx, trail in enumerate(self.solution):
-            # current
-            [x, y] = trail
-
-            if idx == len(self.solution) - 1:
-                # last cell
-                [x_p, y_p] = trail[idx - 1]
-                from_d = direction(x - x_p, y - y_p)
-                TRAIL_LAST[from_d](x * S, y * S)
-
-                t.dot(x * S, y * S, S / 5)
-
-            else:
-                [x_n, y_n] = trail[idx + 1]
-
-                if (idx == 0):
-                    # First cell
-                    if (x == x_n):
-                        t1(x * S, y * S)
-                    else:
-                        t4(x * S, y * S)
-
-                else:
-                    [x_p, y_p] = trail[idx - 1]
-                    from_d = direction(x - x_p, y - y_p)
-                    to_d = direction(x - x_n, y - y_n)
-
-                    t_cell = TRAIL_CELLS[from_d][to_d]
-                    current_cell = grid[y][x]
-                    if (t_cell == tc and current_cell == cg):
-                        tg(x * S, y * S)
-                    elif (t_cell == t3 and current_cell == ch):
-                        th(x * S, y * S)
-                    else:
-                        t_cell(x * S, y * S)
+        self.walls.render(grid)
+        if solution:
+            self.over_trace.render(grid, solution)
+            self.under_trace.render(grid, solution)
+        self.solution = solution
 
     def image(self):
-        return f"""<svg id="maze" width="{self.width}" height="{self.height}" stroke-width="{self.stroke_width}" fill-opacity="0.0" stroke="#000">
-          {self.p.path()}
-          {self.t.path()}
-          {self.f.path()}
-          {self.dots}
-         </svg>"""
+        w = self.width * self.S
+        h = self.height * self.S
+        viewBox = f"""viewBox="0 0 {w} {h}" """
+        head = f"""<svg id="maze" xmlns="http://www.w3.org/2000/svg" {viewBox} width="{w}px" height="{h}px" stroke-width="{self.stroke_width}" fill-opacity="0.0" stroke="black">"""
+
+        if self.solution:
+            return f"{head} {self.walls.path()} {self.over_trace.path()} {self.under_trace.path()} {self.dots} </svg>"
+        else:
+            return f"{head} {self.walls.path()} {self.dots} </svg>"
 
 
-def render(grid, options):
+def svg_render(grid, options):
     svg = SVG(grid, options)
     return svg.image()

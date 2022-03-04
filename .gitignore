@@ -45,3 +45,10 @@ maze/renderers/js/solved.svg
 **/node_modules/*
 **/node_modules.node_module.nosync/*
 maze/node_modules.nosync/
+.idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/maze.iml
+.idea/markdown.xml
+.idea/jsLinters/jshint.xml
+.idea/inspectionProfiles/Project_Default.xml

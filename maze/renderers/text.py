@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 
-def render(grid, options):
+def text_render(grid, options):
 
     TILES = {0: ('   ',
                  '   '),
