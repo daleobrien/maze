@@ -17,11 +17,11 @@ python3 setup.py install
 
 To export a 20 by 30 maze SVG and a solution SVG, run:
 ```bash
-maze svg maze.svg -s maze-solved.svg -W 20 -H 30
+maze svg maze.svg -s maze-solved.svg -W 23 -H 30
 ```
 To using python3 directly, change into the directory with the file `maze.py` and run:
 ```bash
-python3 maze.py svg maze.svg -s maze-solved.svg -W 20 -H 30
+python3 maze.py svg maze.svg -s maze-solved.svg -W 23 -H 30
 ```
 will produce:
 
@@ -29,7 +29,10 @@ will produce:
 |-------------------|----------------------------|
 | ![Maze](maze.svg) | ![Solved](maze-solved.svg) |
 
-Using the `-S` option will produce a maze with no curves produces:
+Using the `-S` option will produce a maze with no curves e.g.:
+```bash
+maze svg maze-straight.svg -s maze-straight-solved.svg -W 23 -H 30
+```
 
 | maze.svg                   | maze-solved.svg                     |
 |----------------------------|-------------------------------------|
