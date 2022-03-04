@@ -20,7 +20,7 @@ Usage:
   maze text [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-i MAZE_ID]
   maze canvas [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-L] [-f FILENAME] [-i MAZE_ID]
   maze javascript [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY]  [-L] [-f FILENAME] [-i MAZE_ID]
-  maze svg [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-f FILENAME] [-i MAZE_ID]
+  maze svg [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-f FILENAME] [-i MAZE_ID] [-s SOLUTION_FILENAME]
   maze data [-W WIDTH] [-H HEIGHT] [-p PAGE_SIZE] [-d DENSITY] [-S] [-L] [-i MAZE_ID]
 
 Options:
@@ -39,6 +39,8 @@ Options:
   -O --orientation ORIENTATION  Orientation, P=portrait, L=landscape [default: P]
 
   -i --maze_id MAZE_ID          Text used to identify which maze otherwise a random maze will be generated
+  
+  -s --solution SOLUTION_FILENAME   Save the solution to the maze to a file
 
 Examples:
 
@@ -57,9 +59,6 @@ N, S, E, W, U = 0x1, 0x2, 0x4, 0x8, 0x10
 DX = {E: 1, W: -1, N: 0, S: 0}
 DY = {E: 0, W: 0, N: -1, S: 1}
 OPPOSITE = {E: W, W: E, N: S, S: N}
-
-
-#
 
 
 class Tree(object):
@@ -141,9 +140,9 @@ def create_maze(width, height, density, add_a_loop):
             grid[sy][sx] |= N
 
             edges[:] = [(x, y, d) for (x, y, d) in edges if not (
-                    (x == cx and y == cy) or
-                    (x == ex and y == ey and d == W) or
-                    (x == sx and y == sy and d == N)
+                (x == cx and y == cy) or
+                (x == ex and y == ey and d == W) or
+                (x == sx and y == sy and d == N)
             )]
 
     # Kruskal's algorithm
@@ -187,7 +186,7 @@ def get_moves(grid, coordinate, cell):
     if cell & W == W:
         inc = -1
         # if the next cell is an under or over cell, jump over it
-        while grid[y][x+inc] in (19, 28): # could be more than one in a row
+        while grid[y][x+inc] in (19, 28):  # could be more than one in a row
             inc -= 1
         moves.append((inc, 0))
     if cell & E == E:
@@ -216,7 +215,7 @@ def search(grid, coordinate, sofar, depth):
 
         # if are back to where we where, then are in a loop
         if new_coordinate in sofar:
-             continue
+            continue
 
         new_so_far = [s for s in sofar]
         new_so_far.append(new_coordinate)
@@ -231,8 +230,7 @@ def search(grid, coordinate, sofar, depth):
 
 
 def find_solution(grid):
-    sofar = search(grid, (0, 0),  [(0, 0)], 0)
-    print('Solution ->', sofar)
+    return search(grid, (0, 0),  [(0, 0)], 0)
 
 
 def maze(args):
@@ -268,19 +266,23 @@ def maze(args):
     if generate_data:
         filename = "maze.pdf"
 
+    grid = create_maze(width, height, density, add_a_loop)
+
+    solution = None
+    solution_filename = args['--solution']
+    if solution_filename:
+        solution = find_solution(grid)
+
+    return_data = {'maze_id': f"{maze_id}"}
+
     # render options
     render_options = {'filename': filename,
                       'draw_with_curves': not args['-S'],
                       'use_A4': use_A4,
                       'landscape': args['--orientation'] == 'L',
                       'width': width,
-                      'height': height}
-
-    grid = create_maze(width, height, density, add_a_loop)
-
-    # solution = find_solution(grid)
-
-    return_data = {'maze_id': f"{maze_id}"}
+                      'height': height,
+                      'solution': solution}
 
     # to pdf, if we have a filename
     if filename and generate_data or generate_pdf:

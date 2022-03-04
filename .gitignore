@@ -42,4 +42,5 @@ html/maze.svg
 html/maze.svg
 maze/renderers/js/solved.svg
 
-maze/node_modules
+**/node_modules/*
+**/node_modules.node_module.nosync/*
