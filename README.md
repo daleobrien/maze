@@ -1,52 +1,53 @@
-maze
-====
-[![Downloads](http://pepy.tech/badge/maze)](http://pepy.tech/project/maze)
+<h1 align="center">maze</h1>
 
-[Website](https://maze.do.id.au/?level=medium)
+<p align="center">Weave mazes, generated in Python, as SVG, PDF or text.</p>
 
-Maze generator with crossings.
+<p align="center">
+  <a href="https://maze.do.id.au/?maze=straight"><b>Play</b></a> &nbsp;·&nbsp;
+  <a href="#quick-start">Quick start</a> &nbsp;·&nbsp;
+  <a href="#documents">Documents</a> &nbsp;·&nbsp;
+  <a href="#how-it-works">How it works</a>
+</p>
 
-Installation
+<p align="center">
+  <img src="https://raw.githubusercontent.com/daleobrien/maze/master/docs/cover.png" alt="A weave maze with its solution" width="100%">
+</p>
+
+maze makes **weave mazes**: mazes whose passages cross over and under each
+other. It writes them as SVG, PDF or plain text, with an optional solution. For
+something faster, with a hand-drawn look and more styles, see its Rust port,
+[maze-rs](https://github.com/daleobrien/maze-rs). Play them in the browser at
+[maze.do.id.au](https://maze.do.id.au/?maze=straight).
+
+## Quick start
+
 ```bash
 pip3 install maze
-```
-Or install from source:
-```bash
-python3 setup.py install
-```
-
-To export a 20 by 30 maze SVG and a solution SVG, run:
-```bash
-maze svg maze.svg -s maze-solved.svg -W 23 -H 30
-```
-To using python3 directly, change into the directory with the file `maze.py` and run:
-```bash
-python3 maze.py svg maze.svg -s maze-solved.svg -W 23 -H 30
-```
-will produce:
-
-| maze.svg                                                                   | maze-solved.svg                                                                   | 
-|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| ![](https://github.com/daleobrien/maze/blob/master/docs/maze.svg?raw=True) | ![](https://github.com/daleobrien/maze/blob/master/docs/maze-solved.svg?raw=True) |
-
-Using the `-S` option will produce a maze with no curves e.g.:
-```bash
-maze svg maze-straight.svg -s maze-straight-solved.svg -W 23 -H 30
+maze svg maze.svg -s maze-solved.svg -W 23 -H 30   # a maze and its solution
+maze pdf my_maze.pdf                               # an A4 page
+maze text -W 20 -H 10                              # to the terminal
+maze                                               # every option
 ```
 
-| maze.svg                                                                            | maze-solved.svg                                                                            |
-|-------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| ![](https://github.com/daleobrien/maze/blob/master/docs/maze-straight.svg?raw=True) | ![](https://github.com/daleobrien/maze/blob/master/docs/maze-straight-solved.svg?raw=True) |
+The same maze id (`-i`) always gives the same maze. See
+[Using maze](https://github.com/daleobrien/maze/blob/master/docs/usage.md) for
+the options and examples.
 
+## Documents
 
-To generate PDF (currenlty this options doesn't allow solutions to be generated)
-```bash
-maze pdf my_maze.pdf
-```
-will produce a pdf.
+| Document | What's in it |
+| -------- | ------------ |
+| [Using maze](https://github.com/daleobrien/maze/blob/master/docs/usage.md) | Installing, making mazes, every option, and examples with and without curves |
+| [How it works](https://github.com/daleobrien/maze/blob/master/docs/how-it-works.md) | The weave algorithm, the code, and the Rust version |
 
-Run `maze` without any arguments to see all options.
+## How it works
 
+The grid is first decorated with the over-and-under crossings, then Kruskal's
+algorithm joins the cells into one maze, a technique described by Robin
+Houston. `maze/maze.py` makes and solves the maze, and `maze/renderers/` draws
+it as SVG, PDF or text. [How it works](https://github.com/daleobrien/maze/blob/master/docs/how-it-works.md)
+has more.
 
+---
 
-
+<p align="center"><sub>Part of <a href="https://daleobrien.github.io/#mazes">Mazes</a> &nbsp;·&nbsp; more at <a href="https://daleobrien.github.io">daleobrien.github.io</a></sub></p>
