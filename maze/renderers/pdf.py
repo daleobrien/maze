@@ -16,6 +16,7 @@ def pdf_render(grid, options):
     draw_with_curves = options['draw_with_curves']
     filename = options['filename']
     use_A4 = options['use_A4']
+    use_A0 = options['use_A0']
     landscape = options['landscape']
     width = options['width']
     height = options['height']
@@ -66,6 +67,9 @@ def pdf_render(grid, options):
     if use_A4:
         page_width = 8.3 * dpi
         page_height = 11.7 * dpi
+    elif use_A0:
+        page_width = 33.1 * dpi
+        page_height = 46.8 * dpi
     else:
         page_width = 8.5 * dpi
         page_height = 11.0 * dpi

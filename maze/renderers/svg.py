@@ -524,6 +524,7 @@ class SVG(object):
         width = options['width']
         height = options['height']
         use_A4 = options['use_A4']
+        use_A0 = options['use_A0']
         draw_with_curves = options['draw_with_curves']
         solution = options['solution']
         left_margin = 0
@@ -532,6 +533,9 @@ class SVG(object):
         if use_A4:
             page_width = 8.3 * dpi
             page_height = 11.7 * dpi
+        elif use_A0:
+            page_width = 33.1 * dpi
+            page_height = 46.8 * dpi
         else:
             # US Letter
             page_width = 8.5 * dpi

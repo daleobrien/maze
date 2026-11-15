@@ -32,11 +32,11 @@ Options:
 
   -S                                Draw with straight lines instead of curves
 
-  -p PAGE_SIZE                      Page size, (A4 or Letter) [default: A4]
+  -p PAGE_SIZE                      Page size, (A0,A4 or Letter) [default: A4]
   -O --orientation ORIENTATION      Orientation, P=portrait, L=landscape [default: P]
 
   -i --maze_id MAZE_ID              Identify which maze, otherwise a random maze will be generated
-  
+
   -s --solution SOLUTION_FILENAME   Save the solution to the maze to a file
 
 Examples:
@@ -143,7 +143,7 @@ def create_maze(width, height, density, add_a_loop):
             grid[sy][sx] |= N
 
             edges[:] = [(x, y, d) for (x, y, d) in edges if not (
-                    (x == cx and y == cy) or (x == ex and y == ey and d == W) or (x == sx and y == sy and d == N))]
+                (x == cx and y == cy) or (x == ex and y == ey and d == W) or (x == sx and y == sy and d == N))]
 
     # Kruskal's algorithm
     while edges:
@@ -248,13 +248,15 @@ def maze(args):
 
     add_a_loop = args['-L']
 
-    if args['-p'] not in ('A4', 'a4', 'Letter', 'letter'):
-        print('Page size can only be A4 or Letter')
+    if args['-p'].lower() not in ('a4', 'letter', 'a0'):
+        print('Page size can only be A4, Letter, or A0')
         print("e.g.  -p A4")
         print("You had -p", args['-p'])
         exit(-1)
 
     use_A4 = True if args['-p'] == 'A4' else False
+    use_A0 = True if args['-p'] == 'A0' else False
+    print(f"width = {width}, height={height}")
 
     grid = create_maze(width, height, density, add_a_loop)
 
@@ -264,8 +266,13 @@ def maze(args):
         solution = find_solution(grid)
 
     # render options
-    options = {'filename': filename, 'draw_with_curves': not args['-S'], 'use_A4': use_A4,
-               'landscape': args['--orientation'] == 'L', 'width': width, 'height': height, 'solution': solution}
+    options = {'filename': filename, 'draw_with_curves': not args['-S'],
+        'use_A4': use_A4,
+        'use_A0': use_A0,
+        'landscape': args['--orientation'] == 'L',
+        'width': width,
+        'height': height,
+        'solution': solution}
 
     if args['pdf']:
         pdf = pdf_render(grid, options)

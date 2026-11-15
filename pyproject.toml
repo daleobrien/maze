@@ -1,3 +1,14 @@
 [build-system]
 build-backend = 'setuptools.build_meta'
 requires = ['setuptools >= 47', 'wheel']
+
+[project]
+name = "maze"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "docopt>=0.6.2",
+    "reportlab>=4.4.1",
+]

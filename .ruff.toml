@@ -1,0 +1,20 @@
+[tool.ruff]
+line-length = 88
+extend-ignore = [
+    "E203",  # Whitespace before ':'
+    "W503",  # Line break before binary operator
+]
+
+# You can customize further rules here if needed
+select = ["E", "F", "W", "C90"]
+exclude = [
+    "build/",
+    "dist/",
+    ".venv/",
+    "__pycache__/",
+]
+
+# You can add per-file-ignores if needed, for example:
+# per-file-ignores = {
+#     "some_file.py": ["F401"],  # Ignore unused imports in some_file.py
+# }
